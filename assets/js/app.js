@@ -127,14 +127,14 @@ function drawBuilding(scores){
   const zText = selectedZone==="1" ? "ZONE 1 FIELD" : selectedZone==="2" ? "ZONE 2 EDGE" : "ZONE 3 CORNER";
   const exp = sval("exposure");
   const floorMid = stories===2 ? `
-      <line x1="190" y1="220" x2="430" y2="260" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-      <line x1="430" y1="260" x2="555" y2="205" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-      <text x="80" y="240" fill="#9fb2cc" font-size="11">Level 2</text>
+      <line x1="220" y1="214" x2="458" y2="254" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+      <line x1="458" y1="254" x2="596" y2="197" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+      <text x="124" y="232" fill="#c4d5ea" font-size="13" font-weight="700">LEVEL 2</text>
   ` : "";
   const windowSecond = stories===2 ? `
-      <rect x="245" y="160" width="38" height="52" rx="4" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
-      <rect x="335" y="175" width="38" height="52" rx="4" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
-      <polygon points="478,170 515,154 515,203 478,221" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
+      <rect x="288" y="156" width="40" height="54" rx="3" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
+      <rect x="384" y="172" width="40" height="54" rx="3" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
+      <polygon points="530,164 568,148 568,201 530,218" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
   ` : "";
   const heightLabel = stories===2 ? "two-floor vertical load path" : "single-floor load path";
 
@@ -182,9 +182,9 @@ function drawBuilding(scores){
     <rect x="0" y="0" width="920" height="470" fill="url(#gridIso)"/>
     <rect x="0" y="0" width="920" height="470" fill="url(#gridFine)"/>
 
-    <text x="28" y="36" fill="#ffffff" font-size="18" font-weight="800">Building Component Risk Diagram</text>
-    <text x="28" y="60" fill="#9fb2cc" font-size="12">${storyLabel} • Exposure ${exp} • ${zText} • BIM-style conceptual massing</text>
-    <text x="28" y="80" fill="#7ea0c8" font-size="11">Not to scale · illustrative zones only · verify with engineered drawings and code references</text>
+    <text x="28" y="38" fill="#ffffff" font-size="20" font-weight="800">Building Component Risk Diagram</text>
+    <text x="28" y="66" fill="#b6c9df" font-size="14" font-weight="700">${storyLabel} • Exposure ${exp} • ${zText}</text>
+    <text x="28" y="88" fill="#8da9c9" font-size="12">BIM-like segmentation · not to scale · confirm with engineered documents</text>
 
     <g transform="translate(55,18)" filter="url(#dropIso)">
       <!-- wind direction indicators -->
@@ -204,74 +204,76 @@ function drawBuilding(scores){
       </g>
 
       <!-- ground platform -->
-      <polygon points="105,335 430,390 640,300 315,245" fill="rgba(77,163,255,.13)" stroke="#35577c" stroke-width="2"/>
-      <polygon class="flood-pulse" points="128,312 415,360 592,286 305,238" fill="url(#floodGlow)" />
+      <polygon points="116,350 470,407 702,310 348,252" fill="rgba(77,163,255,.13)" stroke="#35577c" stroke-width="2"/>
+      <polygon class="flood-pulse" points="148,326 458,376 652,297 342,246" fill="url(#floodGlow)" />
       <g class="flood-wave">
-        <line x1="138" y1="305" x2="432" y2="354" stroke="rgba(190,233,255,.28)" stroke-width="2"/>
-        <line x1="168" y1="293" x2="458" y2="342" stroke="rgba(190,233,255,.2)" stroke-width="1.6"/>
-        <line x1="198" y1="282" x2="488" y2="330" stroke="rgba(190,233,255,.16)" stroke-width="1.3"/>
+        <line x1="160" y1="317" x2="476" y2="368" stroke="rgba(190,233,255,.28)" stroke-width="2"/>
+        <line x1="190" y1="304" x2="504" y2="356" stroke="rgba(190,233,255,.2)" stroke-width="1.6"/>
+        <line x1="222" y1="292" x2="536" y2="344" stroke="rgba(190,233,255,.16)" stroke-width="1.3"/>
       </g>
-      <polygon points="128,312 415,360 592,286 305,238" fill="${floodC}" opacity=".88" stroke="#d8e2f2" stroke-width="2"/>
-      <text x="390" y="350" fill="#07111f" font-size="13" font-weight="900">FLOOD / SITE INTERFACE</text>
+      <polygon points="148,326 458,376 652,297 342,246" fill="${floodC}" opacity=".88" stroke="#d8e2f2" stroke-width="2"/>
+      <text x="430" y="365" fill="#07111f" font-size="14" font-weight="900">FOUNDATION + FLOOD INTERFACE</text>
 
       <!-- main building mass -->
-      <polygon points="190,130 430,170 430,360 190,320" fill="${structC}" stroke="#d8e2f2" stroke-width="2"/>
-      <polygon points="430,170 555,115 555,305 430,360" fill="${envC}" stroke="#d8e2f2" stroke-width="2"/>
-      <polygon points="190,130 315,75 555,115 430,170" fill="${roofC}" stroke="#d8e2f2" stroke-width="2"/>
+      <polygon points="220,124 458,164 458,352 220,312" fill="${structC}" stroke="#d8e2f2" stroke-width="2"/>
+      <polygon points="458,164 596,107 596,295 458,352" fill="${envC}" stroke="#d8e2f2" stroke-width="2"/>
+      <polygon points="220,124 358,68 596,107 458,164" fill="${roofC}" stroke="#d8e2f2" stroke-width="2"/>
+      <polygon points="220,312 458,352 458,377 220,338" fill="${floodC}" opacity=".92" stroke="#d8e2f2" stroke-width="2"/>
+      <polygon points="458,352 596,295 596,320 458,377" fill="${floodC}" opacity=".86" stroke="#d8e2f2" stroke-width="2"/>
 
       <!-- subtle component lines -->
-      <line x1="190" y1="175" x2="430" y2="215" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
-      <line x1="190" y1="255" x2="430" y2="295" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
-      <line x1="430" y1="215" x2="555" y2="160" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
-      <line x1="430" y1="295" x2="555" y2="240" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+      <line x1="220" y1="172" x2="458" y2="212" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+      <line x1="220" y1="248" x2="458" y2="288" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+      <line x1="458" y1="212" x2="596" y2="155" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+      <line x1="458" y1="288" x2="596" y2="231" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
       ${floorMid}
 
       <!-- openings -->
-      <rect x="245" y="245" width="42" height="58" rx="4" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
-      <rect x="340" y="260" width="42" height="58" rx="4" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
-      <polygon points="480,238 520,220 520,278 480,296" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
+      <rect x="286" y="238" width="44" height="60" rx="3" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
+      <rect x="382" y="254" width="44" height="60" rx="3" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
+      <polygon points="530,230 572,212 572,273 530,291" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
       ${windowSecond}
 
       <!-- vertical load path lines -->
-      <line x1="215" y1="138" x2="215" y2="320" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
-      <line x1="405" y1="166" x2="405" y2="355" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
-      <line x1="532" y1="125" x2="532" y2="314" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
+      <line x1="246" y1="132" x2="246" y2="337" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
+      <line x1="434" y1="160" x2="434" y2="372" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
+      <line x1="572" y1="118" x2="572" y2="317" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
 
       <!-- zone badges -->
       <g>
-        <circle cx="318" cy="105" r="28" fill="rgba(0,0,0,.35)" stroke="#fff" stroke-width="4"/>
-        <text x="318" y="113" text-anchor="middle" fill="#fff" font-size="20" font-weight="900">R</text>
+        <circle cx="358" cy="98" r="28" fill="rgba(0,0,0,.4)" stroke="#fff" stroke-width="4"/>
+        <text x="358" y="106" text-anchor="middle" fill="#fff" font-size="20" font-weight="900">R</text>
       </g>
       <g>
-        <circle cx="505" cy="190" r="27" fill="rgba(0,0,0,.35)" stroke="#fff" stroke-width="4"/>
-        <text x="505" y="198" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">O</text>
+        <circle cx="542" cy="182" r="27" fill="rgba(0,0,0,.4)" stroke="#fff" stroke-width="4"/>
+        <text x="542" y="190" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">O</text>
       </g>
       <g>
-        <circle cx="300" cy="210" r="27" fill="rgba(0,0,0,.35)" stroke="#fff" stroke-width="4"/>
-        <text x="300" y="218" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">S</text>
+        <circle cx="334" cy="204" r="27" fill="rgba(0,0,0,.4)" stroke="#fff" stroke-width="4"/>
+        <text x="334" y="212" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">S</text>
       </g>
       <g>
-        <circle cx="292" cy="338" r="27" fill="rgba(0,0,0,.35)" stroke="#fff" stroke-width="4"/>
-        <text x="292" y="346" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">F</text>
+        <circle cx="330" cy="360" r="27" fill="rgba(0,0,0,.4)" stroke="#fff" stroke-width="4"/>
+        <text x="330" y="368" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">F</text>
       </g>
     </g>
 
     <!-- right legend -->
     <g transform="translate(670,70)" font-family="Arial">
       <rect x="0" y="0" width="220" height="270" rx="14" fill="rgba(7,16,30,.78)" stroke="#26364f"/>
-      <text x="16" y="28" fill="#fff" font-size="13" font-weight="800">Component Status</text>
+      <text x="16" y="30" fill="#fff" font-size="14" font-weight="800">Component Status</text>
 
-      <circle cx="22" cy="55" r="7" fill="${roofC}"/><text x="38" y="59" fill="#dfe9f8" font-size="12">R Roof: ${roofL}</text>
-      <circle cx="22" cy="83" r="7" fill="${envC}"/><text x="38" y="87" fill="#dfe9f8" font-size="12">O Openings: ${envL}</text>
-      <circle cx="22" cy="111" r="7" fill="${structC}"/><text x="38" y="115" fill="#dfe9f8" font-size="12">S Structure: ${structL}</text>
-      <circle cx="22" cy="139" r="7" fill="${floodC}"/><text x="38" y="143" fill="#dfe9f8" font-size="12">F Flood: ${floodL}</text>
+      <circle cx="22" cy="56" r="7" fill="${roofC}"/><text x="38" y="61" fill="#dfe9f8" font-size="13">R Roof: ${roofL}</text>
+      <circle cx="22" cy="86" r="7" fill="${envC}"/><text x="38" y="91" fill="#dfe9f8" font-size="13">O Openings: ${envL}</text>
+      <circle cx="22" cy="116" r="7" fill="${structC}"/><text x="38" y="121" fill="#dfe9f8" font-size="13">S Structure: ${structL}</text>
+      <circle cx="22" cy="146" r="7" fill="${floodC}"/><text x="38" y="151" fill="#dfe9f8" font-size="13">F Foundation/Flood: ${floodL}</text>
 
-      <text x="16" y="170" fill="#9fb2cc" font-size="11">${heightLabel}</text>
-      <line x1="14" y1="186" x2="206" y2="186" stroke="#2b3d58"/>
-      <text x="16" y="206" fill="#d7e3f7" font-size="11">Technical Tags</text>
-      <text x="16" y="224" fill="#9fb2cc" font-size="10">• Vertical datum from FEMA attributes</text>
-      <text x="16" y="240" fill="#9fb2cc" font-size="10">• Envelope + structure + flood weighting</text>
-      <text x="16" y="256" fill="#9fb2cc" font-size="10">• Exposure and zone penalties applied</text>
+      <text x="16" y="174" fill="#9fb2cc" font-size="12">${heightLabel}</text>
+      <line x1="14" y1="190" x2="206" y2="190" stroke="#2b3d58"/>
+      <text x="16" y="211" fill="#d7e3f7" font-size="12">Technical Tags</text>
+      <text x="16" y="230" fill="#9fb2cc" font-size="11">• Roof / wall / opening / foundation split</text>
+      <text x="16" y="246" fill="#9fb2cc" font-size="11">• Vertical datum from FEMA attributes</text>
+      <text x="16" y="262" fill="#9fb2cc" font-size="11">• Exposure and zone penalties applied</text>
     </g>
 
     <g stroke="rgba(207,229,255,.7)" stroke-width="1.3" fill="none" font-family="Arial">
