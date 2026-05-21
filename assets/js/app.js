@@ -256,6 +256,12 @@ function recommendations(inputs, fScore, fema){
   const recs=[];
   const exp=sval("exposure"), wz=sval("windZone");
   const floodZone=String(fema.zone||"").toUpperCase();
+  const mpiLabel = (value)=>{
+    const mpi = parseInt(value,10);
+    if(!Number.isNaN(mpi) && mpi>=1 && mpi<=3) return "MPI: Critical Priority";
+    if(!Number.isNaN(mpi) && mpi>=4 && mpi<=6) return "MPI: Moderate Priority";
+    return "MPI: Lower Priority / Monitoring Recommended";
+  };
 
   if(inputs.loadpathAdj < 70 || inputs.roofAdj < 70){
     recs.push(["1","Roof / Load Path Upgrade","Review hurricane clips, straps, roof-to-wall connections, roof deck attachment, and continuous load path from roof framing to foundation.","Priority: High","bad"]);
@@ -289,7 +295,8 @@ function recommendations(inputs, fScore, fema){
   }
   document.getElementById("recommendations").innerHTML = recs.slice(0,8).map(r=>`
     <div class="rec">
-      <div class="num ${r[4]}">${r[0]}</div>
+      <div class="num ${r[4]}" title="Mitigation Priority Index (MPI): lower numbers are more urgent.">${r[0]}</div>
+      <small class="mpi-caption">Mitigation Priority Index (MPI): ${r[0]} • ${mpiLabel(r[0])}</small>
       <b>${r[1]}</b>
       <p>${r[2]}</p>
       <span class="tag ${r[4]}">${r[3]}</span>
