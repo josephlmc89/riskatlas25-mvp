@@ -111,12 +111,16 @@
 </aside>
 
 <main>
-  <section class="grid">
+  <section class="card risk-summary" style="margin-bottom:12px">
+    <h2>Risk Summary</h2>
+    <div class="grid">
     <div class="metric"><div class="k">Resilience Score</div><div class="v" id="score">--</div><div class="small" id="scoreClass">Pending</div></div>
     <div class="metric"><div class="k">FEMA Flood Zone</div><div class="v" id="floodZone">--</div><div class="small" id="sfha">NFHL lookup pending</div></div>
     <div class="metric"><div class="k">Base Flood Elevation</div><div class="v" id="bfeValue">--</div><div class="small" id="bfeDatum">BFE pending</div></div>
     <div class="metric"><div class="k">Wind Exposure</div><div class="v" id="expMetric">--</div><div class="small" id="windMetric">Pending</div></div>
     <div class="metric"><div class="k">Hurricane Exposure Index</div><div class="v" id="hIndex">--</div><div class="small">Rule-based screening proxy</div></div>
+      </div>
+    <button id="downloadPdfBtn" class="secondary" onclick="downloadPdfReport()">Download PDF Report</button>
   </section>
 
   <section class="twocol">
@@ -158,6 +162,8 @@
 </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

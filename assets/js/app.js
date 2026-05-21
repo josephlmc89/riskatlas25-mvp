@@ -337,6 +337,89 @@ function calculateAndRender(geo,fema){
 }
 
 
+async function downloadPdfReport(){
+  if(!window.html2canvas || !window.jspdf){
+    setStatus("PDF libraries not loaded. Refresh and try again.");
+    return;
+  }
+
+  const addressValue = document.getElementById("address").value || "--";
+  const sections = [
+    {title:"Address Information", element:document.querySelector('.twocol .card:nth-child(2)')},
+    {title:"Risk Summary", element:document.querySelector('.risk-summary')},
+    {title:"Risk Profile Radar", element:document.getElementById("radar")},
+    {title:"Building Diagram", element:document.getElementById("buildingGraphic")},
+    {title:"Recommendations", element:document.getElementById("recommendations")}
+  ];
+
+  if(sections.some(s => !s.element)){
+    setStatus("Unable to locate report sections for PDF capture.");
+    return;
+  }
+
+  const originalStatus = document.getElementById("status").textContent;
+  setStatus("Generating PDF report...");
+
+  try{
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "pt", "letter");
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 36;
+    const contentWidth = pageWidth - (margin * 2);
+    let y = margin;
+
+    const addNewPageIfNeeded = (requiredHeight = 0) => {
+      if(y + requiredHeight > pageHeight - margin){
+        pdf.addPage();
+        y = margin;
+      }
+    };
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(18);
+    pdf.text("RiskAtlas25 Report", margin, y);
+    y += 22;
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(11);
+    pdf.text(`Address: ${addressValue}`, margin, y, {maxWidth: contentWidth});
+    y += 16;
+    pdf.text(`Generated: ${new Date().toLocaleString()}`, margin, y);
+    y += 18;
+
+    for(const section of sections){
+      addNewPageIfNeeded(40);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(13);
+      pdf.text(section.title, margin, y);
+      y += 8;
+
+      const canvas = await html2canvas(section.element, {
+        backgroundColor: "#0b1526",
+        scale: 2,
+        useCORS: true
+      });
+      const imgData = canvas.toDataURL("image/png");
+      const imgHeight = (canvas.height * contentWidth) / canvas.width;
+      addNewPageIfNeeded(imgHeight + 14);
+      pdf.addImage(imgData, "PNG", margin, y, contentWidth, imgHeight);
+      y += imgHeight + 14;
+    }
+
+    pdf.save("RiskAtlas25_Report.pdf");
+    setStatus("PDF report downloaded: RiskAtlas25_Report.pdf");
+  }catch(e){
+    setStatus(`PDF generation failed: ${e.message}`);
+  }
+
+  setTimeout(()=>{
+    if(document.getElementById("status").textContent.includes("PDF")){
+      setStatus(originalStatus);
+    }
+  }, 2500);
+}
+
+
 async function runAssessment(){
   const address=document.getElementById("address").value.trim();
   if(!address){setStatus("Enter an address first.");return;}
