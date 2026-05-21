@@ -263,7 +263,7 @@ function radar(values){
     const ly=cy+Math.sin(ang)*(maxR+22)+labelOffsets[i].y;
     const score=Math.max(0,Math.min(100,Math.round(values[i])));
 
-    labelHtml+=`<text x="${lx}" y="${ly}" fill="#b9c9de" font-size="11" text-anchor="middle">${labels[i]}</text>`;
+    labelHtml+=`<text x="${lx}" y="${ly}" fill="#b9c9de" font-size="11" text-anchor="middle">${labels[i]} ${score}</text>`;
     scoreHtml+=`<text x="${lx+scoreOffsets[i].x}" y="${ly+scoreOffsets[i].y}" fill="#f5f9ff" font-size="12" font-weight="700" text-anchor="middle">${score}</text>`;
 
     const rr=maxR*(values[i]/100);
