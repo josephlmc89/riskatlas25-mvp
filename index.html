@@ -152,21 +152,17 @@
     <div class="card">
       <h2>Risk Profile Radar</h2>
       <div class="svgbox" id="radar"></div>
-      <div class="helper-panel" aria-label="Radar interpretation legend">
-        <h3>Radar Legend & Interpretation</h3>
-        <p class="helper-text">The radar chart visualizes relative resilience across major building systems. Larger and more balanced shapes generally indicate stronger overall resilience performance.</p>
-        <ul class="legend-list">
-          <li><span class="dot strong" aria-hidden="true"></span>Scores closer to the outer edge indicate stronger resilience.</li>
-          <li><span class="dot weak" aria-hidden="true"></span>Scores closer to the center indicate higher vulnerability.</li>
-        </ul>
+      <div class="helper-panel" aria-label="Radar interpretation panel">
+        <h3>Radar Interpretation</h3>
+        <p class="helper-text">Scores extending closer to the outer edge indicate stronger resilience and lower vulnerability. Scores closer to the center indicate elevated vulnerability or weaker system performance.</p>
       </div>
       <div class="helper-panel" aria-label="Score Interpretation panel">
         <h3>Score Interpretation</h3>
-        <ul class="scale-list">
-          <li><strong>80–100</strong> = High Resilience</li>
-          <li><strong>60–79</strong> = Moderate Resilience</li>
-          <li><strong>40–59</strong> = Elevated Vulnerability</li>
-          <li><strong>0–39</strong> = Critical Vulnerability</li>
+        <ul class="score-legend" role="list">
+          <li class="score-band high"><span class="band-swatch" aria-hidden="true"></span><strong>80–100</strong> → High Resilience</li>
+          <li class="score-band moderate"><span class="band-swatch" aria-hidden="true"></span><strong>60–79</strong> → Moderate Resilience</li>
+          <li class="score-band elevated"><span class="band-swatch" aria-hidden="true"></span><strong>40–59</strong> → Elevated Vulnerability</li>
+          <li class="score-band critical"><span class="band-swatch" aria-hidden="true"></span><strong>0–39</strong> → Critical Vulnerability</li>
         </ul>
       </div>
     </div>
