@@ -134,12 +134,15 @@ function drawBuilding(scores){
   const heightLabel = stories===2 ? "two-floor vertical load path" : "single-floor load path";
 
   document.getElementById("buildingGraphic").innerHTML = `
-  <svg width="720" height="290" viewBox="0 0 720 430" xmlns="http://www.w3.org/2000/svg">
+  <svg width="100%" height="100%" viewBox="0 0 920 470" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
     <defs>
       <linearGradient id="bgIso" x1="0" x2="1" y1="0" y2="1">
         <stop offset="0" stop-color="#071426"/>
         <stop offset="1" stop-color="#102846"/>
       </linearGradient>
+      <pattern id="gridFine" width="10" height="10" patternUnits="userSpaceOnUse">
+        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,.03)" stroke-width="1"/>
+      </pattern>
       <linearGradient id="glass" x1="0" x2="1">
         <stop offset="0" stop-color="#7ed6ff"/>
         <stop offset="1" stop-color="#2f80ed"/>
@@ -152,13 +155,15 @@ function drawBuilding(scores){
       </pattern>
     </defs>
 
-    <rect x="0" y="0" width="720" height="430" fill="url(#bgIso)"/>
-    <rect x="0" y="0" width="720" height="430" fill="url(#gridIso)"/>
+    <rect x="0" y="0" width="920" height="470" fill="url(#bgIso)"/>
+    <rect x="0" y="0" width="920" height="470" fill="url(#gridIso)"/>
+    <rect x="0" y="0" width="920" height="470" fill="url(#gridFine)"/>
 
     <text x="28" y="36" fill="#ffffff" font-size="18" font-weight="800">Building Component Risk Diagram</text>
-    <text x="28" y="60" fill="#9fb2cc" font-size="12">${storyLabel} • Exposure ${exp} • ${zText}</text>
+    <text x="28" y="60" fill="#9fb2cc" font-size="12">${storyLabel} • Exposure ${exp} • ${zText} • BIM-style conceptual massing</text>
+    <text x="28" y="80" fill="#7ea0c8" font-size="11">Not to scale · illustrative zones only · verify with engineered drawings and code references</text>
 
-    <g transform="translate(40,10)" filter="url(#dropIso)">
+    <g transform="translate(55,18)" filter="url(#dropIso)">
       <!-- ground platform -->
       <polygon points="105,335 430,390 640,300 315,245" fill="rgba(77,163,255,.13)" stroke="#35577c" stroke-width="2"/>
       <polygon points="128,312 415,360 592,286 305,238" fill="${floodC}" opacity=".88" stroke="#d8e2f2" stroke-width="2"/>
@@ -207,8 +212,8 @@ function drawBuilding(scores){
     </g>
 
     <!-- right legend -->
-    <g transform="translate(545,70)" font-family="Arial">
-      <rect x="0" y="0" width="145" height="185" rx="14" fill="rgba(7,16,30,.76)" stroke="#26364f"/>
+    <g transform="translate(670,70)" font-family="Arial">
+      <rect x="0" y="0" width="220" height="270" rx="14" fill="rgba(7,16,30,.78)" stroke="#26364f"/>
       <text x="16" y="28" fill="#fff" font-size="13" font-weight="800">Component Status</text>
 
       <circle cx="22" cy="55" r="7" fill="${roofC}"/><text x="38" y="59" fill="#dfe9f8" font-size="12">R Roof: ${roofL}</text>
@@ -217,6 +222,17 @@ function drawBuilding(scores){
       <circle cx="22" cy="139" r="7" fill="${floodC}"/><text x="38" y="143" fill="#dfe9f8" font-size="12">F Flood: ${floodL}</text>
 
       <text x="16" y="170" fill="#9fb2cc" font-size="11">${heightLabel}</text>
+      <line x1="14" y1="186" x2="206" y2="186" stroke="#2b3d58"/>
+      <text x="16" y="206" fill="#d7e3f7" font-size="11">Technical Tags</text>
+      <text x="16" y="224" fill="#9fb2cc" font-size="10">• Vertical datum from FEMA attributes</text>
+      <text x="16" y="240" fill="#9fb2cc" font-size="10">• Envelope + structure + flood weighting</text>
+      <text x="16" y="256" fill="#9fb2cc" font-size="10">• Exposure and zone penalties applied</text>
+    </g>
+
+    <g stroke="rgba(207,229,255,.7)" stroke-width="1.3" fill="none" font-family="Arial">
+      <line x1="585" y1="118" x2="650" y2="94"/><text x="654" y="94" fill="#cfe5ff" font-size="10">Roof pressure zone</text>
+      <line x1="566" y1="244" x2="650" y2="212"/><text x="654" y="212" fill="#cfe5ff" font-size="10">Opening vulnerability</text>
+      <line x1="465" y1="332" x2="650" y2="318"/><text x="654" y="318" fill="#cfe5ff" font-size="10">Foundation flood interface</text>
     </g>
 
     <!-- bottom technical tags -->
@@ -225,8 +241,8 @@ function drawBuilding(scores){
       <text x="92" y="401" text-anchor="middle" fill="#9dccff" font-size="12" font-weight="800">Wind Zone ${selectedZone}</text>
       <rect x="166" y="382" width="128" height="28" rx="14" fill="rgba(166,108,255,.16)" stroke="rgba(166,108,255,.32)"/>
       <text x="230" y="401" text-anchor="middle" fill="#c5a9ff" font-size="12" font-weight="800">Exposure ${exp}</text>
-      <rect x="304" y="382" width="148" height="28" rx="14" fill="rgba(255,200,87,.13)" stroke="rgba(255,200,87,.32)"/>
-      <text x="378" y="401" text-anchor="middle" fill="#ffd982" font-size="12" font-weight="800">${storyLabel}</text>
+      <rect x="304" y="382" width="176" height="28" rx="14" fill="rgba(255,200,87,.13)" stroke="rgba(255,200,87,.32)"/>
+      <text x="392" y="401" text-anchor="middle" fill="#ffd982" font-size="12" font-weight="800">${storyLabel}</text>
     </g>
   </svg>`;
 }
