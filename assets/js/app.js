@@ -32,8 +32,8 @@ function zonePenalty(z){
 }
 
 function roofEnvelopeAdjustment(type){
-  if(type==="metal") return 4;
-  if(type==="tile") return -9;
+  if(type==="metal") return 8;
+  if(type==="tile") return -10;
   return 0;
 }
 function roofEnvelopeLabel(type){
@@ -276,7 +276,7 @@ function recommendations(inputs, fScore, fema){
     recs.push(["7","Tile Roof Verification","Verify tile attachment method, underlayment condition, uplift resistance, and debris impact risk.","Priority: Targeted Roof Review","warn"]);
   }
   if(inputs.roofType==="metal"){
-    recs.push(["8","Metal Roof Verification","Verify panel attachment, edge fastening, corrosion exposure, and product approval documentation.","Priority: Targeted Roof Review","warn"]);
+    recs.push(["8","Metal Roof Verification","Verify metal panel attachment, edge fastening, corrosion exposure, and product approval documentation.","Priority: Targeted Roof Review","warn"]);
   }
   if(recs.length===0){
     recs.push(["1","Monitoring & Documentation","Maintain photographic records, post-storm inspection logs, product approvals, and annual review of flood/wind exposure conditions.","Priority: Monitoring","good"]);
