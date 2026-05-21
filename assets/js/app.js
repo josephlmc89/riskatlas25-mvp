@@ -31,6 +31,17 @@ function zonePenalty(z){
   return 0;
 }
 
+function roofEnvelopeAdjustment(type){
+  if(type==="metal") return 4;
+  if(type==="tile") return -9;
+  return 0;
+}
+function roofEnvelopeLabel(type){
+  if(type==="metal") return "Metal Roof";
+  if(type==="tile") return "Tile Roof";
+  return "Asphalt Shingles";
+}
+
 function normalizeBFE(attr){
   if(!attr) return {value:null, unit:"", datum:"", display:"Not returned"};
   const candidates = ["STATIC_BFE","BFE","BASE_FLOOD_ELEVATION","ELEV","FLD_ELEV","DEPTH"];
@@ -261,10 +272,16 @@ function recommendations(inputs, fScore, fema){
   if(inputs.codeEra < 70){
     recs.push(["6","Code Era Verification","Verify original permit era, retrofit history, product approvals, and whether the building predates current wind and flood-resilience requirements.","Priority: Documentation","blue"]);
   }
+  if(inputs.roofType==="tile"){
+    recs.push(["7","Tile Roof Verification","Verify tile attachment method, underlayment condition, uplift resistance, and debris impact risk.","Priority: Targeted Roof Review","warn"]);
+  }
+  if(inputs.roofType==="metal"){
+    recs.push(["8","Metal Roof Verification","Verify panel attachment, edge fastening, corrosion exposure, and product approval documentation.","Priority: Targeted Roof Review","warn"]);
+  }
   if(recs.length===0){
     recs.push(["1","Monitoring & Documentation","Maintain photographic records, post-storm inspection logs, product approvals, and annual review of flood/wind exposure conditions.","Priority: Monitoring","good"]);
   }
-  document.getElementById("recommendations").innerHTML = recs.slice(0,6).map(r=>`
+  document.getElementById("recommendations").innerHTML = recs.slice(0,8).map(r=>`
     <div class="rec">
       <div class="num ${r[4]}">${r[0]}</div>
       <b>${r[1]}</b>
@@ -273,11 +290,12 @@ function recommendations(inputs, fScore, fema){
     </div>`).join("");
 }
 function calculateAndRender(geo,fema){
-  const exp=sval("exposure"), wind=val("windSpeed"), wz=sval("windZone");
+  const exp=sval("exposure"), wind=val("windSpeed"), wz=sval("windZone"), roofType=sval("roofType");
   const baseRoof=val("roof"), openings=val("openings"), loadpath=val("loadpath"), drainage=val("drainage"), elevation=val("elevation"), codeEra=val("codeEra");
   const ep=exposurePenalty(exp), zp=zonePenalty(wz);
   const storyPenalty = stories===2 ? 5 : 0;
-  const roofAdj=Math.max(0,baseRoof-ep-zp-storyPenalty);
+  const roofTypeModifier = roofEnvelopeAdjustment(roofType);
+  const roofAdj=Math.max(0,baseRoof-ep-zp-storyPenalty+roofTypeModifier);
   const loadpathAdj=Math.max(0,loadpath-(stories===2?6:0)-zp*.35);
   const fScore=floodScore(fema.zone,fema.sfha,elevation);
   const hi=hurricaneIndex(geo.lat,geo.lon,geo.state,exp,wind);
@@ -300,15 +318,16 @@ function calculateAndRender(geo,fema){
   document.getElementById("county").textContent=(geo.county||"--")+", "+(geo.state||"--");
   document.getElementById("femaSource").textContent=fema.source||"--";
   document.getElementById("zoneStory").textContent="Zone "+wz+" / "+stories+" story";
-  document.getElementById("notes").textContent=fema.zone==="Not Found"?"FEMA polygon not found at point; manual review recommended.":"Preliminary screening only.";
+  document.getElementById("roofTypeDisplay").textContent=roofEnvelopeLabel(roofType);
+  document.getElementById("notes").textContent=fema.zone==="Not Found"?"FEMA polygon not found at point; manual review recommended. All roof/envelope type effects are preliminary screening assumptions only, not a final engineering determination.":"Preliminary screening only. Roof/envelope type effects are assumptions pending field verification and not a final engineering determination.";
   document.getElementById("mapbox").innerHTML=mapIframe(geo.lat,geo.lon);
 
   const scores={roofAdj, openings, loadpathAdj, flood:fScore};
   drawBuilding(scores);
   radar([roofAdj,openings,loadpathAdj,fScore,drainage,codeEra]);
-  recommendations({roofAdj,openings,loadpathAdj,drainage,elevation,codeEra}, fScore, fema);
+  recommendations({roofAdj,openings,loadpathAdj,drainage,elevation,codeEra,roofType}, fScore, fema);
 
-  snapshot={generatedAt:new Date().toISOString(),address:document.getElementById("address").value,geo,fema,stories,exposure:exp,windZone:wz,windSpeed:wind,scores:{roofAdj,openings,loadpathAdj,flood:fScore,drainage,codeEra,total},classification,hurricaneExposureIndex:hi};
+  snapshot={generatedAt:new Date().toISOString(),address:document.getElementById("address").value,geo,fema,stories,exposure:exp,windZone:wz,windSpeed:wind,roofType:roofEnvelopeLabel(roofType),scores:{roofAdj,openings,loadpathAdj,flood:fScore,drainage,codeEra,total,roofTypeModifier},classification,hurricaneExposureIndex:hi};
 }
 
 
