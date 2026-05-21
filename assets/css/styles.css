@@ -1,0 +1,39 @@
+:root{
+  --bg:#07101e;--panel:#121c2e;--panel2:#0e1728;--line:#26364f;
+  --text:#eef4ff;--muted:#9fb2cc;--blue:#4da3ff;--cyan:#4ddcff;
+  --good:#38d878;--warn:#ffc857;--bad:#ff6b6b;--crit:#ff3b30;--purple:#a66cff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top,#10213a,#07101e 55%,#040914);font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+header{padding:20px 28px;border-bottom:1px solid var(--line);background:rgba(5,12,24,.96);display:flex;justify-content:space-between;align-items:center;gap:18px}
+.brand h1{margin:0;font-size:25px;letter-spacing:.2px}.brand span{color:#68d13f}.sub{font-size:13px;color:var(--muted);margin-top:6px}
+.badge{border:1px solid var(--line);background:#0b1424;border-radius:14px;padding:10px 14px;font-size:12px;color:var(--muted)}
+.wrap{display:grid;grid-template-columns:390px 1fr;gap:18px;padding:18px}
+.card{background:linear-gradient(180deg,rgba(18,28,46,.97),rgba(12,20,34,.97));border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 14px 32px rgba(0,0,0,.32)}
+h2{font-size:16px;margin:0 0 14px;display:flex;gap:6px;align-items:center}
+h3{font-size:14px;margin:18px 0 10px;color:#dfe9f8}
+label{display:block;margin:12px 0 6px;color:var(--muted);font-size:12px}
+input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#0b1424;color:var(--text);outline:none}
+button{width:100%;padding:12px;border:0;border-radius:12px;margin-top:14px;font-weight:800;background:linear-gradient(135deg,#1985ff,#60d2ff);color:#fff;cursor:pointer}
+button.secondary{background:#1b2942;border:1px solid var(--line)}
+.segment{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.segbtn{margin-top:0;background:#0b1424;border:1px solid var(--line);color:#dfe9f8}
+.segbtn.active{background:linear-gradient(135deg,#1767d8,#2da8ff);border-color:#2da8ff}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.metric{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:15px;min-height:98px}
+.k{font-size:12px;color:var(--muted);margin-bottom:10px}.v{font-size:24px;font-weight:900}.small{font-size:12px;color:var(--muted);margin-top:8px}
+.twocol{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-top:14px}
+.row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:10px 0;font-size:13px}.row:last-child{border-bottom:0}
+.muted{color:var(--muted)}
+.pill{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}
+.good{background:rgba(56,216,120,.16);color:#84f5ad}.warn{background:rgba(255,200,87,.18);color:#ffd982}.bad{background:rgba(255,107,107,.18);color:#ff9a9a}.crit{background:rgba(255,59,48,.20);color:#ff938e}.blue{background:rgba(77,163,255,.18);color:#9dccff}.purple{background:rgba(166,108,255,.18);color:#c5a9ff}
+.status{font-size:12px;color:var(--muted);line-height:1.45;background:#0b1424;border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:14px;white-space:pre-wrap}
+.mapbox{height:330px;border-radius:16px;border:1px solid var(--line);overflow:hidden;background:#0b1424;display:grid;place-items:center}
+.mapbox iframe{width:100%;height:100%;border:0}.svgbox{height:290px;background:#0b1424;border:1px solid var(--line);border-radius:16px;display:grid;place-items:center;overflow:hidden}
+.recs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rec{background:#0b1424;border:1px solid var(--line);border-radius:14px;padding:14px;min-height:142px}
+.rec .num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:900;margin-bottom:10px}
+.rec b{display:block;margin-bottom:8px}.rec p{font-size:12px;color:#c8d6ea;line-height:1.45;margin:0 0 10px}.rec .tag{font-size:11px;font-weight:800}
+.disclaimer{font-size:11px;color:var(--muted);line-height:1.45}
+.note{background:rgba(77,163,255,.08);border:1px solid rgba(77,163,255,.25);padding:10px;border-radius:12px;font-size:12px;color:#cfe5ff;line-height:1.4}
+@media(max-width:1100px){.wrap,.grid,.twocol,.recs{grid-template-columns:1fr}header{display:block}.badge{margin-top:12px}}
