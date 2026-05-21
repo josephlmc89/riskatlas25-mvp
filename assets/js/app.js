@@ -138,180 +138,102 @@ function recalculateIfReady(){
 }
 
 function drawBuilding(scores){
-  const roofL=level(scores.roofAdj), envL=level(scores.openings), structL=level(scores.loadpathAdj), floodL=level(scores.flood);
-  const roofC=colorByLevel(roofL), envC=colorByLevel(envL), structC=colorByLevel(structL), floodC=colorByLevel(floodL);
+  const roofL=level(scores.roofAdj), openingsL=level(scores.openings), structL=level(scores.loadpathAdj), floodL=level(scores.flood);
+  const roofC=colorByLevel(roofL), openingsC=colorByLevel(openingsL), structC=colorByLevel(structL), floodC=colorByLevel(floodL);
   const storyLabel = stories===2 ? "2-STORY BUILDING" : "1-STORY BUILDING";
   const selectedZone = sval("windZone");
   const zText = selectedZone==="1" ? "ZONE 1 FIELD" : selectedZone==="2" ? "ZONE 2 EDGE" : "ZONE 3 CORNER";
   const exp = sval("exposure");
-  const floorMid = stories===2 ? `
-      <line x1="220" y1="214" x2="458" y2="254" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-      <line x1="458" y1="254" x2="596" y2="197" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
-      <text x="124" y="232" fill="#c4d5ea" font-size="13" font-weight="700">LEVEL 2</text>
-  ` : "";
-  const windowSecond = stories===2 ? `
-      <rect x="288" y="156" width="40" height="54" rx="3" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
-      <rect x="384" y="172" width="40" height="54" rx="3" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
-      <polygon points="530,164 568,148 568,201 530,218" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
-  ` : "";
-  const heightLabel = stories===2 ? "two-floor vertical load path" : "single-floor load path";
+  const floorBreak = stories===2 ? `
+      <line x1="226" y1="228" x2="470" y2="270" class="line"/>
+      <line x1="470" y1="270" x2="618" y2="209" class="line"/>
+    ` : "";
+  const upperOpenings = stories===2 ? `
+      <rect x="292" y="172" width="42" height="48" rx="2" class="window"/>
+      <rect x="390" y="188" width="42" height="48" rx="2" class="window"/>
+      <polygon points="548,180 586,164 586,212 548,228" class="window"/>
+    ` : "";
 
   document.getElementById("buildingGraphic").innerHTML = `
-  <svg width="100%" height="100%" viewBox="0 0 920 470" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <svg width="100%" height="100%" viewBox="0 0 920 470" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Building zone risk map">
     <defs>
-      <linearGradient id="bgIso" x1="0" x2="1" y1="0" y2="1">
-        <stop offset="0" stop-color="#071426"/>
-        <stop offset="1" stop-color="#102846"/>
-      </linearGradient>
-      <pattern id="gridFine" width="10" height="10" patternUnits="userSpaceOnUse">
-        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,.03)" stroke-width="1"/>
-      </pattern>
-      <linearGradient id="glass" x1="0" x2="1">
-        <stop offset="0" stop-color="#7ed6ff"/>
-        <stop offset="1" stop-color="#2f80ed"/>
-      </linearGradient>
-      <filter id="dropIso">
-        <feDropShadow dx="0" dy="16" stdDeviation="10" flood-color="#000" flood-opacity=".45"/>
-      </filter>
-      <pattern id="gridIso" width="24" height="24" patternUnits="userSpaceOnUse">
-        <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
-      </pattern>
-      <linearGradient id="floodGlow" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0" stop-color="rgba(138,220,255,.35)"/>
-        <stop offset=".65" stop-color="rgba(71,169,255,.22)"/>
-        <stop offset="1" stop-color="rgba(23,86,153,.08)"/>
-      </linearGradient>
+      <linearGradient id="bgTech" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#081729"/><stop offset="1" stop-color="#0f2742"/></linearGradient>
+      <pattern id="gridTech" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="rgba(255,255,255,.045)" stroke-width="1"/></pattern>
+      <linearGradient id="roofFace" x1="0" x2="1"><stop offset="0" stop-color="${roofC}"/><stop offset="1" stop-color="#dce8f7" stop-opacity=".24"/></linearGradient>
+      <linearGradient id="openFace" x1="0" x2="1"><stop offset="0" stop-color="${openingsC}"/><stop offset="1" stop-color="#dce8f7" stop-opacity=".24"/></linearGradient>
+      <linearGradient id="upperFace" x1="0" x2="1"><stop offset="0" stop-color="${structC}"/><stop offset="1" stop-color="#dce8f7" stop-opacity=".2"/></linearGradient>
+      <linearGradient id="lowerFace" x1="0" x2="1"><stop offset="0" stop-color="${structC}"/><stop offset="1" stop-color="#dce8f7" stop-opacity=".1"/></linearGradient>
+      <linearGradient id="foundationFace" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${floodC}"/><stop offset="1" stop-color="#0c1f36"/></linearGradient>
       <style>
-        .wind-arrow { opacity: .42; animation: drift 4.4s ease-in-out infinite; will-change: transform, opacity; }
-        .wind-arrow:nth-of-type(2){ animation-delay: .6s; }
-        .wind-arrow:nth-of-type(3){ animation-delay: 1.2s; }
-        .flood-wave { animation: wave 5s linear infinite; will-change: transform; }
-        .flood-pulse { animation: pulse 3.6s ease-in-out infinite; }
-        @keyframes drift { 0%,100% { transform: translateX(0); opacity: .3; } 50% { transform: translateX(12px); opacity: .52; } }
-        @keyframes wave { from { transform: translateX(0); } to { transform: translateX(18px); } }
-        @keyframes pulse { 0%,100% { opacity: .17; } 50% { opacity: .29; } }
-        @media (prefers-reduced-motion: reduce), (max-width: 760px) {
-          .wind-arrow, .flood-wave, .flood-pulse { animation: none !important; }
-        }
+        .line{stroke:rgba(219,231,247,.62);stroke-width:1.5}
+        .outline{stroke:#dde7f4;stroke-width:2.1}
+        .label{font:700 11px Inter,Segoe UI,Arial,sans-serif;fill:#d4e3f5;letter-spacing:.07em}
+        .zoneTag{fill:#0a1525;stroke:#d7e3f3;stroke-width:1.5}
+        .zoneTxt{font:800 13px Inter,Segoe UI,Arial,sans-serif;fill:#eaf2ff}
+        .legendTxt{font:600 12px Inter,Segoe UI,Arial,sans-serif;fill:#dce7f6}
+        .window{fill:#78bdea;stroke:#153251;stroke-width:2}
       </style>
     </defs>
 
-    <rect x="0" y="0" width="920" height="470" fill="url(#bgIso)"/>
-    <rect x="0" y="0" width="920" height="470" fill="url(#gridIso)"/>
-    <rect x="0" y="0" width="920" height="470" fill="url(#gridFine)"/>
+    <rect x="0" y="0" width="920" height="470" fill="url(#bgTech)"/>
+    <rect x="0" y="0" width="920" height="470" fill="url(#gridTech)"/>
 
-    <text x="28" y="38" fill="#ffffff" font-size="20" font-weight="800">Building Component Risk Diagram</text>
-    <text x="28" y="66" fill="#b6c9df" font-size="14" font-weight="700">${storyLabel} • Exposure ${exp} • ${zText}</text>
-    <text x="28" y="88" fill="#8da9c9" font-size="12">BIM-like segmentation · not to scale · confirm with engineered documents</text>
+    <text x="24" y="34" fill="#f1f6ff" font-size="18" font-weight="800">Building Zone Risk Map</text>
+    <text x="24" y="56" fill="#b7cbe3" font-size="12" font-weight="700">${storyLabel} • Exposure ${exp} • ${zText}</text>
 
-    <g transform="translate(55,18)" filter="url(#dropIso)">
-      <!-- wind direction indicators -->
-      <g transform="translate(84,54)">
-        <g class="wind-arrow">
-          <line x1="0" y1="0" x2="75" y2="0" stroke="rgba(197,227,255,.8)" stroke-width="2.2" stroke-linecap="round"/>
-          <polygon points="75,0 64,-6 64,6" fill="rgba(197,227,255,.8)"/>
-        </g>
-        <g class="wind-arrow" transform="translate(0,26)">
-          <line x1="0" y1="0" x2="95" y2="0" stroke="rgba(197,227,255,.72)" stroke-width="2" stroke-linecap="round"/>
-          <polygon points="95,0 84,-6 84,6" fill="rgba(197,227,255,.72)"/>
-        </g>
-        <g class="wind-arrow" transform="translate(0,52)">
-          <line x1="0" y1="0" x2="82" y2="0" stroke="rgba(197,227,255,.68)" stroke-width="1.8" stroke-linecap="round"/>
-          <polygon points="82,0 72,-5 72,5" fill="rgba(197,227,255,.68)"/>
-        </g>
-      </g>
+    <g transform="translate(58,18)">
+      <polygon points="120,346 498,408 736,311 360,250" fill="rgba(98,147,197,.14)" class="outline"/>
 
-      <!-- ground platform -->
-      <polygon points="116,350 470,407 702,310 348,252" fill="rgba(77,163,255,.13)" stroke="#35577c" stroke-width="2"/>
-      <polygon class="flood-pulse" points="148,326 458,376 652,297 342,246" fill="url(#floodGlow)" />
-      <g class="flood-wave">
-        <line x1="160" y1="317" x2="476" y2="368" stroke="rgba(190,233,255,.28)" stroke-width="2"/>
-        <line x1="190" y1="304" x2="504" y2="356" stroke="rgba(190,233,255,.2)" stroke-width="1.6"/>
-        <line x1="222" y1="292" x2="536" y2="344" stroke="rgba(190,233,255,.16)" stroke-width="1.3"/>
-      </g>
-      <polygon points="148,326 458,376 652,297 342,246" fill="${floodC}" opacity=".88" stroke="#d8e2f2" stroke-width="2"/>
-      <text x="430" y="365" fill="#07111f" font-size="14" font-weight="900">FOUNDATION + FLOOD INTERFACE</text>
+      <polygon points="226,132 470,174 470,338 226,296" fill="url(#upperFace)" class="outline"/>
+      <polygon points="226,228 470,270 470,338 226,296" fill="url(#lowerFace)" class="outline" opacity=".95"/>
+      <polygon points="470,174 618,113 618,278 470,338" fill="url(#openFace)" class="outline"/>
+      <polygon points="470,246 618,185 618,278 470,338" fill="url(#openFace)" class="outline" opacity=".88"/>
+      <polygon points="226,132 374,72 618,113 470,174" fill="url(#roofFace)" class="outline"/>
+      <polygon points="226,296 470,338 470,374 226,332" fill="url(#foundationFace)" class="outline"/>
+      <polygon points="470,338 618,278 618,315 470,374" fill="url(#foundationFace)" class="outline"/>
 
-      <!-- main building mass -->
-      <polygon points="220,124 458,164 458,352 220,312" fill="${structC}" stroke="#d8e2f2" stroke-width="2"/>
-      <polygon points="458,164 596,107 596,295 458,352" fill="${envC}" stroke="#d8e2f2" stroke-width="2"/>
-      <polygon points="220,124 358,68 596,107 458,164" fill="${roofC}" stroke="#d8e2f2" stroke-width="2"/>
-      <polygon points="220,312 458,352 458,377 220,338" fill="${floodC}" opacity=".92" stroke="#d8e2f2" stroke-width="2"/>
-      <polygon points="458,352 596,295 596,320 458,377" fill="${floodC}" opacity=".86" stroke="#d8e2f2" stroke-width="2"/>
+      <line x1="226" y1="176" x2="470" y2="218" class="line"/>
+      <line x1="470" y1="218" x2="618" y2="157" class="line"/>
+      ${floorBreak}
 
-      <!-- subtle component lines -->
-      <line x1="220" y1="172" x2="458" y2="212" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
-      <line x1="220" y1="248" x2="458" y2="288" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
-      <line x1="458" y1="212" x2="596" y2="155" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
-      <line x1="458" y1="288" x2="596" y2="231" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
-      ${floorMid}
+      <rect x="292" y="244" width="42" height="52" rx="2" class="window"/>
+      <rect x="390" y="260" width="42" height="52" rx="2" class="window"/>
+      <polygon points="548,238 586,222 586,275 548,291" class="window"/>
+      ${upperOpenings}
 
-      <!-- openings -->
-      <rect x="286" y="238" width="44" height="60" rx="3" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
-      <rect x="382" y="254" width="44" height="60" rx="3" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
-      <polygon points="530,230 572,212 572,273 530,291" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
-      ${windowSecond}
+      <g transform="translate(374,95)"><rect x="-24" y="-14" width="48" height="28" rx="14" class="zoneTag"/><text text-anchor="middle" y="5" class="zoneTxt">Z1</text></g>
+      <g transform="translate(326,202)"><rect x="-24" y="-14" width="48" height="28" rx="14" class="zoneTag"/><text text-anchor="middle" y="5" class="zoneTxt">Z2</text></g>
+      <g transform="translate(326,274)"><rect x="-24" y="-14" width="48" height="28" rx="14" class="zoneTag"/><text text-anchor="middle" y="5" class="zoneTxt">Z3</text></g>
+      <g transform="translate(548,220)"><rect x="-24" y="-14" width="48" height="28" rx="14" class="zoneTag"/><text text-anchor="middle" y="5" class="zoneTxt">Z4</text></g>
+      <g transform="translate(338,352)"><rect x="-24" y="-14" width="48" height="28" rx="14" class="zoneTag"/><text text-anchor="middle" y="5" class="zoneTxt">Z5</text></g>
 
-      <!-- vertical load path lines -->
-      <line x1="246" y1="132" x2="246" y2="337" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
-      <line x1="434" y1="160" x2="434" y2="372" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
-      <line x1="572" y1="118" x2="572" y2="317" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
-
-      <!-- zone badges -->
-      <g>
-        <circle cx="358" cy="98" r="28" fill="rgba(0,0,0,.4)" stroke="#fff" stroke-width="4"/>
-        <text x="358" y="106" text-anchor="middle" fill="#fff" font-size="20" font-weight="900">R</text>
-      </g>
-      <g>
-        <circle cx="542" cy="182" r="27" fill="rgba(0,0,0,.4)" stroke="#fff" stroke-width="4"/>
-        <text x="542" y="190" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">O</text>
-      </g>
-      <g>
-        <circle cx="334" cy="204" r="27" fill="rgba(0,0,0,.4)" stroke="#fff" stroke-width="4"/>
-        <text x="334" y="212" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">S</text>
-      </g>
-      <g>
-        <circle cx="330" cy="360" r="27" fill="rgba(0,0,0,.4)" stroke="#fff" stroke-width="4"/>
-        <text x="330" y="368" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">F</text>
-      </g>
+      <text x="148" y="92" class="label">ROOF SYSTEM</text>
+      <text x="122" y="194" class="label">UPPER WALLS</text>
+      <text x="116" y="268" class="label">LOWER WALLS</text>
+      <text x="642" y="216" class="label">OPENINGS</text>
+      <text x="150" y="366" class="label">FOUNDATION</text>
     </g>
 
-    <!-- right legend -->
-    <g transform="translate(670,70)" font-family="Arial">
-      <rect x="0" y="0" width="220" height="270" rx="14" fill="rgba(7,16,30,.78)" stroke="#26364f"/>
-      <text x="16" y="30" fill="#fff" font-size="14" font-weight="800">Component Status</text>
+    <g transform="translate(654,72)">
+      <rect x="0" y="0" width="240" height="292" rx="12" fill="rgba(8,18,30,.86)" stroke="#2a3e5a"/>
+      <text x="16" y="28" fill="#f1f6ff" font-size="14" font-weight="800">Zone Legend & Risk</text>
+      <text x="16" y="48" fill="#9fb6d3" font-size="11">Dynamic scoring and exposure logic preserved</text>
 
-      <circle cx="22" cy="56" r="7" fill="${roofC}"/><text x="38" y="61" fill="#dfe9f8" font-size="13">R Roof: ${roofL}</text>
-      <circle cx="22" cy="86" r="7" fill="${envC}"/><text x="38" y="91" fill="#dfe9f8" font-size="13">O Openings: ${envL}</text>
-      <circle cx="22" cy="116" r="7" fill="${structC}"/><text x="38" y="121" fill="#dfe9f8" font-size="13">S Structure: ${structL}</text>
-      <circle cx="22" cy="146" r="7" fill="${floodC}"/><text x="38" y="151" fill="#dfe9f8" font-size="13">F Foundation/Flood: ${floodL}</text>
+      <rect x="16" y="64" width="10" height="10" fill="${roofC}"/><text x="34" y="73" class="legendTxt">Z1 Roof system: ${roofL}</text>
+      <rect x="16" y="89" width="10" height="10" fill="${structC}"/><text x="34" y="98" class="legendTxt">Z2 Upper walls: ${structL}</text>
+      <rect x="16" y="114" width="10" height="10" fill="${structC}"/><text x="34" y="123" class="legendTxt">Z3 Lower walls: ${structL}</text>
+      <rect x="16" y="139" width="10" height="10" fill="${openingsC}"/><text x="34" y="148" class="legendTxt">Z4 Openings: ${openingsL}</text>
+      <rect x="16" y="164" width="10" height="10" fill="${floodC}"/><text x="34" y="173" class="legendTxt">Z5 Foundation: ${floodL}</text>
 
-      <text x="16" y="174" fill="#9fb2cc" font-size="12">${heightLabel}</text>
-      <line x1="14" y1="190" x2="206" y2="190" stroke="#2b3d58"/>
-      <text x="16" y="211" fill="#d7e3f7" font-size="12">Technical Tags</text>
-      <text x="16" y="230" fill="#9fb2cc" font-size="11">• Roof / wall / opening / foundation split</text>
-      <text x="16" y="246" fill="#9fb2cc" font-size="11">• Vertical datum from FEMA attributes</text>
-      <text x="16" y="262" fill="#9fb2cc" font-size="11">• Exposure and zone penalties applied</text>
-    </g>
-
-    <g stroke="rgba(207,229,255,.7)" stroke-width="1.3" fill="none" font-family="Arial">
-      <line x1="585" y1="118" x2="650" y2="94"/><text x="654" y="94" fill="#cfe5ff" font-size="10">Roof pressure zone</text>
-      <line x1="566" y1="244" x2="650" y2="212"/><text x="654" y="212" fill="#cfe5ff" font-size="10">Opening vulnerability</text>
-      <line x1="465" y1="332" x2="650" y2="318"/><text x="654" y="318" fill="#cfe5ff" font-size="10">Foundation flood interface</text>
-    </g>
-
-    <!-- bottom technical tags -->
-    <g font-family="Arial">
-      <rect x="28" y="382" width="128" height="28" rx="14" fill="rgba(77,163,255,.16)" stroke="rgba(77,163,255,.32)"/>
-      <text x="92" y="401" text-anchor="middle" fill="#9dccff" font-size="12" font-weight="800">Wind Zone ${selectedZone}</text>
-      <rect x="166" y="382" width="128" height="28" rx="14" fill="rgba(166,108,255,.16)" stroke="rgba(166,108,255,.32)"/>
-      <text x="230" y="401" text-anchor="middle" fill="#c5a9ff" font-size="12" font-weight="800">Exposure ${exp}</text>
-      <rect x="304" y="382" width="176" height="28" rx="14" fill="rgba(255,200,87,.13)" stroke="rgba(255,200,87,.32)"/>
-      <text x="392" y="401" text-anchor="middle" fill="#ffd982" font-size="12" font-weight="800">${storyLabel}</text>
+      <line x1="16" y1="188" x2="224" y2="188" stroke="#2a3e5a"/>
+      <text x="16" y="210" fill="#cde0f8" font-size="11">Annotations</text>
+      <text x="16" y="228" fill="#9fb6d3" font-size="11">• Wind zone penalties: ${selectedZone}</text>
+      <text x="16" y="244" fill="#9fb6d3" font-size="11">• Exposure category: ${exp}</text>
+      <text x="16" y="260" fill="#9fb6d3" font-size="11">• Roof envelope adjustments applied</text>
+      <text x="16" y="276" fill="#9fb6d3" font-size="11">• Mobile-safe high-contrast labels</text>
     </g>
   </svg>`;
 }
-
 function radar(values){
   const labels=["Roof","Openings","Load Path","Flood","Drainage","Code Era"];
   const cx=165, cy=142, maxR=92;
