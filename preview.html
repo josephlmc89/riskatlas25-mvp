@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RiskAtlas25 — Live Address Screening MVP v3</title>
+<style>
+:root{
+  --bg:#07101e;--panel:#121c2e;--panel2:#0e1728;--line:#26364f;
+  --text:#eef4ff;--muted:#9fb2cc;--blue:#4da3ff;--cyan:#4ddcff;
+  --good:#38d878;--warn:#ffc857;--bad:#ff6b6b;--crit:#ff3b30;--purple:#a66cff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top,#10213a,#07101e 55%,#040914);font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+header{padding:20px 28px;border-bottom:1px solid var(--line);background:rgba(5,12,24,.96);display:flex;justify-content:space-between;align-items:center;gap:18px}
+.brand h1{margin:0;font-size:25px;letter-spacing:.2px}.brand span{color:#68d13f}.sub{font-size:13px;color:var(--muted);margin-top:6px}
+.badge{border:1px solid var(--line);background:#0b1424;border-radius:14px;padding:10px 14px;font-size:12px;color:var(--muted)}
+.wrap{display:grid;grid-template-columns:390px 1fr;gap:18px;padding:18px}
+.card{background:linear-gradient(180deg,rgba(18,28,46,.97),rgba(12,20,34,.97));border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 14px 32px rgba(0,0,0,.32)}
+h2{font-size:16px;margin:0 0 14px;display:flex;gap:6px;align-items:center}
+h3{font-size:14px;margin:18px 0 10px;color:#dfe9f8}
+label{display:block;margin:12px 0 6px;color:var(--muted);font-size:12px}
+input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:#0b1424;color:var(--text);outline:none}
+button{width:100%;padding:12px;border:0;border-radius:12px;margin-top:14px;font-weight:800;background:linear-gradient(135deg,#1985ff,#60d2ff);color:#fff;cursor:pointer}
+button.secondary{background:#1b2942;border:1px solid var(--line)}
+.segment{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.segbtn{margin-top:0;background:#0b1424;border:1px solid var(--line);color:#dfe9f8}
+.segbtn.active{background:linear-gradient(135deg,#1767d8,#2da8ff);border-color:#2da8ff}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.metric{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:15px;min-height:98px}
+.k{font-size:12px;color:var(--muted);margin-bottom:10px}.v{font-size:24px;font-weight:900}.small{font-size:12px;color:var(--muted);margin-top:8px}
+.twocol{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-top:14px}
+.row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:10px 0;font-size:13px}.row:last-child{border-bottom:0}
+.muted{color:var(--muted)}
+.pill{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}
+.good{background:rgba(56,216,120,.16);color:#84f5ad}.warn{background:rgba(255,200,87,.18);color:#ffd982}.bad{background:rgba(255,107,107,.18);color:#ff9a9a}.crit{background:rgba(255,59,48,.20);color:#ff938e}.blue{background:rgba(77,163,255,.18);color:#9dccff}.purple{background:rgba(166,108,255,.18);color:#c5a9ff}
+.status{font-size:12px;color:var(--muted);line-height:1.45;background:#0b1424;border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:14px;white-space:pre-wrap}
+.mapbox{height:330px;border-radius:16px;border:1px solid var(--line);overflow:hidden;background:#0b1424;display:grid;place-items:center}
+.mapbox iframe{width:100%;height:100%;border:0}.svgbox{height:290px;background:#0b1424;border:1px solid var(--line);border-radius:16px;display:grid;place-items:center;overflow:hidden}
+.recs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rec{background:#0b1424;border:1px solid var(--line);border-radius:14px;padding:14px;min-height:142px}
+.rec .num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:900;margin-bottom:10px}
+.rec b{display:block;margin-bottom:8px}.rec p{font-size:12px;color:#c8d6ea;line-height:1.45;margin:0 0 10px}.rec .tag{font-size:11px;font-weight:800}
+.disclaimer{font-size:11px;color:var(--muted);line-height:1.45}
+.note{background:rgba(77,163,255,.08);border:1px solid rgba(77,163,255,.25);padding:10px;border-radius:12px;font-size:12px;color:#cfe5ff;line-height:1.4}
+@media(max-width:1100px){.wrap,.grid,.twocol,.recs{grid-template-columns:1fr}header{display:block}.badge{margin-top:12px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>RiskAtlas<span>25</span> — Live Address Screening MVP v3</h1>
+    <div class="sub">Preliminary federal-style building resilience screening with FEMA flood lookup, wind exposure input, building zones, and mitigation recommendations.</div>
+  </div>
+  <div class="badge">Rule-based prototype • Not an engineering opinion • Built for NIW exhibit development</div>
+</header>
+
+<div class="wrap">
+<aside class="card">
+  <h2>1. Property Location</h2>
+  <label>U.S. Address</label>
+  <input id="address" value="238 SW 34th Ter, Cape Coral, FL 33914" />
+  <button onclick="runAssessment()">Run Screening</button>
+  <button class="secondary" onclick="downloadSnapshot()">Download JSON Snapshot</button>
+
+  <h2 style="margin-top:22px">2. Building Configuration</h2>
+  <label>Number of Stories</label>
+  <div class="segment">
+    <button class="segbtn active" id="btn1" onclick="setStories(1)">1 Story</button>
+    <button class="segbtn" id="btn2" onclick="setStories(2)">2 Stories</button>
+  </div>
+
+  <label>Wind Exposure Category</label>
+  <select id="exposure" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+    <option value="B">Exposure B — urban/suburban, wooded, obstructed terrain</option>
+    <option value="C" selected>Exposure C — open terrain / coastal plain</option>
+    <option value="D">Exposure D — open water/coastal exposure</option>
+  </select>
+
+  <label>Building Wind Pressure Zone</label>
+  <select id="windZone" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+    <option value="1" selected>Zone 1 — field/interior roof-wall areas</option>
+    <option value="2">Zone 2 — edge / perimeter areas</option>
+    <option value="3">Zone 3 — corner / highest local pressure areas</option>
+  </select>
+
+  <label>Approx. Design Wind Speed</label>
+  <select id="windSpeed" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+    <option value="130">130 mph</option>
+    <option value="140">140 mph</option>
+    <option value="150">150 mph</option>
+    <option value="160" selected>160 mph</option>
+    <option value="170">170 mph</option>
+    <option value="180">180 mph</option>
+  </select>
+
+  <label>Year Built / Code Era</label>
+  <select id="codeEra" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+    <option value="45">Pre-1994 / unknown</option>
+    <option value="58">1994–2001</option>
+    <option value="68">2002–2010</option>
+    <option value="78" selected>2011–2020</option>
+    <option value="88">2021 or newer</option>
+  </select>
+
+  <h2 style="margin-top:22px">3. Building Conditions</h2>
+  <label>Roof System</label>
+  <select id="roof" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+    <option value="85">Good / newer roof</option>
+    <option value="65" selected>Moderate / serviceable</option>
+    <option value="35">Poor / vulnerable</option>
+    <option value="15">Critical deficiency</option>
+  </select>
+  <label>Opening Protection</label>
+  <select id="openings" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+    <option value="90">Impact-rated / shutters</option>
+    <option value="60" selected>Partial protection</option>
+    <option value="30">No verified protection</option>
+    <option value="15">Known vulnerable openings</option>
+  </select>
+  <label>Structural Load Path / Connections</label>
+  <select id="loadpath" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+    <option value="90">Continuous load path verified</option>
+    <option value="65" selected>Partially verified</option>
+    <option value="35">Unknown / likely deficient</option>
+    <option value="15">Known discontinuity</option>
+  </select>
+  <label>Elevation Above Adjacent Grade / BFE Proxy</label>
+  <select id="elevation" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+    <option value="90">Elevated / low flood vulnerability</option>
+    <option value="65">Moderately elevated</option>
+    <option value="35" selected>Low elevation / review needed</option>
+    <option value="15">Below likely flood level / high concern</option>
+  </select>
+  <label>Drainage / Water Intrusion</label>
+  <select id="drainage" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+    <option value="90">Good positive drainage</option>
+    <option value="65" selected>Moderate drainage</option>
+    <option value="35">Poor drainage</option>
+    <option value="15">Known water intrusion</option>
+  </select>
+
+  <div class="status" id="status">Ready. Enter an address and run screening.</div>
+  <p class="disclaimer">This MVP is preliminary. Exposure category, wind zone, connector requirements, flood vents, BFE and final retrofit design must be verified by applicable codes, official flood maps, product approvals, and licensed professionals.</p>
+</aside>
+
+<main>
+  <section class="grid">
+    <div class="metric"><div class="k">Resilience Score</div><div class="v" id="score">--</div><div class="small" id="scoreClass">Pending</div></div>
+    <div class="metric"><div class="k">FEMA Flood Zone</div><div class="v" id="floodZone">--</div><div class="small" id="sfha">NFHL lookup pending</div></div>
+    <div class="metric"><div class="k">Base Flood Elevation</div><div class="v" id="bfeValue">--</div><div class="small" id="bfeDatum">BFE pending</div></div>
+    <div class="metric"><div class="k">Wind Exposure</div><div class="v" id="expMetric">--</div><div class="small" id="windMetric">Pending</div></div>
+    <div class="metric"><div class="k">Hurricane Exposure Index</div><div class="v" id="hIndex">--</div><div class="small">Rule-based screening proxy</div></div>
+  </section>
+
+  <section class="twocol">
+    <div class="card">
+      <h2>Geographic Risk View</h2>
+      <div class="mapbox" id="mapbox"><div class="muted">Map will load after geocoding.</div></div>
+    </div>
+    <div class="card">
+      <h2>Live / Derived Property Data</h2>
+      <div class="row"><span class="muted">Matched Address</span><span id="matched">--</span></div>
+      <div class="row"><span class="muted">Coordinates</span><span id="coords">--</span></div>
+      <div class="row"><span class="muted">County / State</span><span id="county">--</span></div>
+      <div class="row"><span class="muted">FEMA Source</span><span id="femaSource">--</span></div>
+      <div class="row"><span class="muted">BFE / Datum</span><span id="bfeRow">--</span></div>
+      <div class="row"><span class="muted">Wind Zone / Story</span><span id="zoneStory">--</span></div>
+      <div class="row"><span class="muted">Notes</span><span id="notes">--</span></div>
+    </div>
+  </section>
+
+  <section class="twocol">
+    <div class="card">
+      <h2>Building Zone Risk Map</h2>
+      <div class="svgbox" id="buildingGraphic"></div>
+      <div class="note" style="margin-top:12px">
+        Zone map is a preliminary visualization. Zone 1, 2, and 3 represent simplified pressure areas and vulnerability focus zones, not a final ASCE component-and-cladding design.
+      </div>
+    </div>
+    <div class="card">
+      <h2>Risk Profile Radar</h2>
+      <div class="svgbox" id="radar"></div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:14px">
+    <h2>Recommended Mitigation Actions</h2>
+    <div class="recs" id="recommendations"><span class="muted">Run screening to generate recommendations.</span></div>
+  </section>
+</main>
+</div>
+
+<script>
+let lastGeo=null, lastFema=null, snapshot={}, stories=1;
+
+function setStories(n){
+  stories=n;
+  document.getElementById("btn1").classList.toggle("active",n===1);
+  document.getElementById("btn2").classList.toggle("active",n===2);
+  if(lastGeo) calculateAndRender(lastGeo,lastFema);
+}
+function setStatus(msg){document.getElementById("status").textContent=msg;}
+function val(id){return +document.getElementById(id).value;}
+function sval(id){return document.getElementById(id).value;}
+function cls(score){
+  if(score<26)return["Critical Vulnerability","crit"];
+  if(score<51)return["High Vulnerability","bad"];
+  if(score<76)return["Moderate Vulnerability","warn"];
+  return["Resilient Condition","good"];
+}
+function level(score){ if(score<26)return"Critical"; if(score<51)return"High"; if(score<76)return"Moderate"; return"Low"; }
+function colorByLevel(l){return l==="Critical"?"#ff3b30":l==="High"?"#ff6b6b":l==="Moderate"?"#ffc857":"#38d878";}
+function pillClass(l){return l==="Critical"?"crit":l==="High"?"bad":l==="Moderate"?"warn":"good";}
+function exposurePenalty(exp){
+  if(exp==="B") return 0;
+  if(exp==="C") return 10;
+  if(exp==="D") return 20;
+  return 10;
+}
+function zonePenalty(z){
+  if(z==="1") return 0;
+  if(z==="2") return 8;
+  if(z==="3") return 14;
+  return 0;
+}
+
+function normalizeBFE(attr){
+  if(!attr) return {value:null, unit:"", datum:"", display:"Not returned"};
+  const candidates = ["STATIC_BFE","BFE","BASE_FLOOD_ELEVATION","ELEV","FLD_ELEV","DEPTH"];
+  let value = null;
+  let field = null;
+  for(const k of candidates){
+    if(attr[k] !== undefined && attr[k] !== null && attr[k] !== "" && attr[k] !== -9999){
+      value = attr[k]; field = k; break;
+    }
+  }
+  const unit = attr.LEN_UNIT || attr.UNITS || attr.ELEV_UNIT || attr.UNIT || "ft";
+  const datum = attr.V_DATUM || attr.DATUM || attr.VERT_DATUM || "NAVD88 / verify";
+  if(value === null) return {value:null, unit, datum, field:null, display:"Not returned"};
+  const n = Number(value);
+  const clean = isNaN(n) ? String(value) : (Math.round(n * 10) / 10).toString();
+  return {value:clean, unit, datum, field, display:`${clean} ${unit}`};
+}
+
+function floodScore(zone,sfha,elev){
+  let base=55;
+  if(zone){
+    zone=String(zone).toUpperCase();
+    if(zone.includes("VE")||zone==="V")base=12;
+    else if(zone.includes("AE")||zone==="A"||zone.includes("AO")||zone.includes("AH"))base=25;
+    else if(zone.includes("X")&&String(sfha).toUpperCase()==="F")base=82;
+    else if(zone.includes("X"))base=68;
+  }
+  return Math.round((base*.65)+(elev*.35));
+}
+function hurricaneIndex(lat,lon,state,exp,wind){
+  let s=30;
+  const coastal=["FL","TX","LA","MS","AL","GA","SC","NC","VA"];
+  if(coastal.includes(state))s+=25;
+  if(state==="FL")s+=25;
+  if(lat<31 && lon<-79 && lon>-88)s+=12;
+  if(lat>24 && lat<36 && lon<-75 && lon>-98)s+=8;
+  s += exposurePenalty(exp)*.8;
+  s += (wind-130)/5;
+  return Math.min(100,Math.round(s));
+}
+async function geocodeArcGIS(address){
+  const url="https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&maxLocations=1&outFields=*&SingleLine="+encodeURIComponent(address);
+  const r=await fetch(url);
+  if(!r.ok)throw new Error("ArcGIS geocoder did not respond.");
+  const j=await r.json();
+  const c=j.candidates && j.candidates[0];
+  if(!c)throw new Error("No geocoding match found. Try a more complete address.");
+  return {lat:c.location.y, lon:c.location.x, matched:c.address, state:c.attributes.Region || "", county:c.attributes.Subregion || ""};
+}
+async function queryFema(lat,lon){
+  const endpoint="https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28/query";
+  const p=new URLSearchParams({
+    f:"json",
+    geometry:JSON.stringify({x:lon,y:lat,spatialReference:{wkid:4326}}),
+    geometryType:"esriGeometryPoint",
+    inSR:"4326",
+    spatialRel:"esriSpatialRelIntersects",
+    outFields:"*",
+    returnGeometry:"false"
+  });
+  const r=await fetch(endpoint+"?"+p.toString());
+  if(!r.ok)throw new Error("FEMA NFHL service did not respond.");
+  const j=await r.json();
+  const a=(j.features&&j.features[0]&&j.features[0].attributes)||null;
+  if(!a)return {zone:"Not Found",subtype:"No FEMA polygon returned at point",sfha:"--",source:"FEMA NFHL queried",bfe:{value:null,display:"Not returned",datum:""},raw:null};
+  return {zone:a.FLD_ZONE||"Unknown",subtype:a.ZONE_SUBTY||"",sfha:a.SFHA_TF||"--",source:"FEMA NFHL MapServer Layer 28",bfe:normalizeBFE(a),raw:a};
+}
+function mapIframe(lat,lon){
+  const bbox=[lon-0.025,lat-0.018,lon+0.025,lat+0.018].join(",");
+  return `<iframe src="https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}"></iframe>`;
+}
+
+function drawBuilding(scores){
+  const roofL=level(scores.roofAdj), envL=level(scores.openings), structL=level(scores.loadpathAdj), floodL=level(scores.flood);
+  const roofC=colorByLevel(roofL), envC=colorByLevel(envL), structC=colorByLevel(structL), floodC=colorByLevel(floodL);
+  const storyLabel = stories===2 ? "2-STORY BUILDING" : "1-STORY BUILDING";
+  const selectedZone = sval("windZone");
+  const zText = selectedZone==="1" ? "ZONE 1 FIELD" : selectedZone==="2" ? "ZONE 2 EDGE" : "ZONE 3 CORNER";
+  const exp = sval("exposure");
+  const floorMid = stories===2 ? `
+      <line x1="190" y1="220" x2="430" y2="260" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+      <line x1="430" y1="260" x2="555" y2="205" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+      <text x="80" y="240" fill="#9fb2cc" font-size="11">Level 2</text>
+  ` : "";
+  const windowSecond = stories===2 ? `
+      <rect x="245" y="160" width="38" height="52" rx="4" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
+      <rect x="335" y="175" width="38" height="52" rx="4" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
+      <polygon points="478,170 515,154 515,203 478,221" fill="#67c8ff" stroke="#0b1424" stroke-width="3"/>
+  ` : "";
+  const heightLabel = stories===2 ? "two-floor vertical load path" : "single-floor load path";
+
+  document.getElementById("buildingGraphic").innerHTML = `
+  <svg width="720" height="290" viewBox="0 0 720 430" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bgIso" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0" stop-color="#071426"/>
+        <stop offset="1" stop-color="#102846"/>
+      </linearGradient>
+      <linearGradient id="glass" x1="0" x2="1">
+        <stop offset="0" stop-color="#7ed6ff"/>
+        <stop offset="1" stop-color="#2f80ed"/>
+      </linearGradient>
+      <filter id="dropIso">
+        <feDropShadow dx="0" dy="16" stdDeviation="10" flood-color="#000" flood-opacity=".45"/>
+      </filter>
+      <pattern id="gridIso" width="24" height="24" patternUnits="userSpaceOnUse">
+        <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+      </pattern>
+    </defs>
+
+    <rect x="0" y="0" width="720" height="430" fill="url(#bgIso)"/>
+    <rect x="0" y="0" width="720" height="430" fill="url(#gridIso)"/>
+
+    <text x="28" y="36" fill="#ffffff" font-size="18" font-weight="800">Building Component Risk Diagram</text>
+    <text x="28" y="60" fill="#9fb2cc" font-size="12">${storyLabel} • Exposure ${exp} • ${zText}</text>
+
+    <g transform="translate(40,10)" filter="url(#dropIso)">
+      <!-- ground platform -->
+      <polygon points="105,335 430,390 640,300 315,245" fill="rgba(77,163,255,.13)" stroke="#35577c" stroke-width="2"/>
+      <polygon points="128,312 415,360 592,286 305,238" fill="${floodC}" opacity=".88" stroke="#d8e2f2" stroke-width="2"/>
+      <text x="390" y="350" fill="#07111f" font-size="13" font-weight="900">FLOOD / SITE INTERFACE</text>
+
+      <!-- main building mass -->
+      <polygon points="190,130 430,170 430,360 190,320" fill="${structC}" stroke="#d8e2f2" stroke-width="2"/>
+      <polygon points="430,170 555,115 555,305 430,360" fill="${envC}" stroke="#d8e2f2" stroke-width="2"/>
+      <polygon points="190,130 315,75 555,115 430,170" fill="${roofC}" stroke="#d8e2f2" stroke-width="2"/>
+
+      <!-- subtle component lines -->
+      <line x1="190" y1="175" x2="430" y2="215" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+      <line x1="190" y1="255" x2="430" y2="295" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+      <line x1="430" y1="215" x2="555" y2="160" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+      <line x1="430" y1="295" x2="555" y2="240" stroke="rgba(255,255,255,.28)" stroke-width="1"/>
+      ${floorMid}
+
+      <!-- openings -->
+      <rect x="245" y="245" width="42" height="58" rx="4" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
+      <rect x="340" y="260" width="42" height="58" rx="4" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
+      <polygon points="480,238 520,220 520,278 480,296" fill="url(#glass)" stroke="#0b1424" stroke-width="3"/>
+      ${windowSecond}
+
+      <!-- vertical load path lines -->
+      <line x1="215" y1="138" x2="215" y2="320" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
+      <line x1="405" y1="166" x2="405" y2="355" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
+      <line x1="532" y1="125" x2="532" y2="314" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="8,6"/>
+
+      <!-- zone badges -->
+      <g>
+        <circle cx="318" cy="105" r="28" fill="rgba(0,0,0,.35)" stroke="#fff" stroke-width="4"/>
+        <text x="318" y="113" text-anchor="middle" fill="#fff" font-size="20" font-weight="900">R</text>
+      </g>
+      <g>
+        <circle cx="505" cy="190" r="27" fill="rgba(0,0,0,.35)" stroke="#fff" stroke-width="4"/>
+        <text x="505" y="198" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">O</text>
+      </g>
+      <g>
+        <circle cx="300" cy="210" r="27" fill="rgba(0,0,0,.35)" stroke="#fff" stroke-width="4"/>
+        <text x="300" y="218" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">S</text>
+      </g>
+      <g>
+        <circle cx="292" cy="338" r="27" fill="rgba(0,0,0,.35)" stroke="#fff" stroke-width="4"/>
+        <text x="292" y="346" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">F</text>
+      </g>
+    </g>
+
+    <!-- right legend -->
+    <g transform="translate(545,70)" font-family="Arial">
+      <rect x="0" y="0" width="145" height="185" rx="14" fill="rgba(7,16,30,.76)" stroke="#26364f"/>
+      <text x="16" y="28" fill="#fff" font-size="13" font-weight="800">Component Status</text>
+
+      <circle cx="22" cy="55" r="7" fill="${roofC}"/><text x="38" y="59" fill="#dfe9f8" font-size="12">R Roof: ${roofL}</text>
+      <circle cx="22" cy="83" r="7" fill="${envC}"/><text x="38" y="87" fill="#dfe9f8" font-size="12">O Openings: ${envL}</text>
+      <circle cx="22" cy="111" r="7" fill="${structC}"/><text x="38" y="115" fill="#dfe9f8" font-size="12">S Structure: ${structL}</text>
+      <circle cx="22" cy="139" r="7" fill="${floodC}"/><text x="38" y="143" fill="#dfe9f8" font-size="12">F Flood: ${floodL}</text>
+
+      <text x="16" y="170" fill="#9fb2cc" font-size="11">${heightLabel}</text>
+    </g>
+
+    <!-- bottom technical tags -->
+    <g font-family="Arial">
+      <rect x="28" y="382" width="128" height="28" rx="14" fill="rgba(77,163,255,.16)" stroke="rgba(77,163,255,.32)"/>
+      <text x="92" y="401" text-anchor="middle" fill="#9dccff" font-size="12" font-weight="800">Wind Zone ${selectedZone}</text>
+      <rect x="166" y="382" width="128" height="28" rx="14" fill="rgba(166,108,255,.16)" stroke="rgba(166,108,255,.32)"/>
+      <text x="230" y="401" text-anchor="middle" fill="#c5a9ff" font-size="12" font-weight="800">Exposure ${exp}</text>
+      <rect x="304" y="382" width="148" height="28" rx="14" fill="rgba(255,200,87,.13)" stroke="rgba(255,200,87,.32)"/>
+      <text x="378" y="401" text-anchor="middle" fill="#ffd982" font-size="12" font-weight="800">${storyLabel}</text>
+    </g>
+  </svg>`;
+}
+
+function radar(values){
+  const labels=["Roof","Openings","Load Path","Flood","Drainage","Code Era"];
+  const cx=165, cy=142, maxR=92;
+  let axes="", polyPts="", labelHtml="";
+  for(let i=0;i<6;i++){
+    const ang=-Math.PI/2 + i*(2*Math.PI/6);
+    const x=cx+Math.cos(ang)*maxR, y=cy+Math.sin(ang)*maxR;
+    axes+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#26364f"/>`;
+    const lx=cx+Math.cos(ang)*(maxR+36), ly=cy+Math.sin(ang)*(maxR+24);
+    labelHtml+=`<text x="${lx}" y="${ly}" fill="#9fb2cc" font-size="11" text-anchor="middle">${labels[i]}</text>`;
+    const rr=maxR*(values[i]/100);
+    polyPts+=`${cx+Math.cos(ang)*rr},${cy+Math.sin(ang)*rr} `;
+  }
+  let rings="";
+  for(let r of [23,46,69,92]) rings+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#26364f"/>`;
+  document.getElementById("radar").innerHTML=`<svg width="360" height="285" viewBox="0 0 360 285">${rings}${axes}<polygon points="${polyPts}" fill="rgba(77,163,255,.32)" stroke="#4da3ff" stroke-width="2"/>${labelHtml}</svg>`;
+}
+function mapIframe(lat,lon){
+  const bbox=[lon-0.025,lat-0.018,lon+0.025,lat+0.018].join(",");
+  return `<iframe src="https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}"></iframe>`;
+}
+function recommendations(inputs, fScore, fema){
+  const recs=[];
+  const exp=sval("exposure"), wz=sval("windZone");
+  const floodZone=String(fema.zone||"").toUpperCase();
+
+  if(inputs.loadpathAdj < 70 || inputs.roofAdj < 70){
+    recs.push(["1","Roof / Load Path Upgrade","Review hurricane clips, straps, roof-to-wall connections, roof deck attachment, and continuous load path from roof framing to foundation.","Priority: High","bad"]);
+  }
+  if(inputs.openings < 70){
+    recs.push(["2","Opening Protection","Consider impact-rated windows/doors or approved shutter systems for glazed openings, doors, garage doors, and other wind-borne-debris vulnerable openings.","Priority: High","bad"]);
+  }
+  if(fScore < 60 || floodZone.includes("A") || floodZone.includes("V")){
+    recs.push(["3","Flood Mitigation / Flood Vents","For enclosed areas below elevated floors, evaluate engineered or non-engineered flood openings/flood vents, equipment elevation, and dry/wet floodproofing options where allowed.","Priority: Critical Review","crit"]);
+  }
+  if(inputs.drainage < 70){
+    recs.push(["4","Site Drainage Improvement","Improve grading, downspout discharge, surface drainage, and stormwater routing to reduce ponding and water intrusion risk.","Priority: Medium","warn"]);
+  }
+  if(exp==="C" || exp==="D" || wz==="2" || wz==="3"){
+    recs.push(["5","Exposure / Edge-Zone Detailing","Because Exposure "+exp+" and selected Zone "+wz+" increase wind demand, review edge/corner fastening schedules, roof perimeter detailing, and opening protection strategy.","Priority: Technical Review","warn"]);
+  }
+  if(inputs.codeEra < 70){
+    recs.push(["6","Code Era Verification","Verify original permit era, retrofit history, product approvals, and whether the building predates current wind and flood-resilience requirements.","Priority: Documentation","blue"]);
+  }
+  if(recs.length===0){
+    recs.push(["1","Monitoring & Documentation","Maintain photographic records, post-storm inspection logs, product approvals, and annual review of flood/wind exposure conditions.","Priority: Monitoring","good"]);
+  }
+  document.getElementById("recommendations").innerHTML = recs.slice(0,6).map(r=>`
+    <div class="rec">
+      <div class="num ${r[4]}">${r[0]}</div>
+      <b>${r[1]}</b>
+      <p>${r[2]}</p>
+      <span class="tag ${r[4]}">${r[3]}</span>
+    </div>`).join("");
+}
+function calculateAndRender(geo,fema){
+  const exp=sval("exposure"), wind=val("windSpeed"), wz=sval("windZone");
+  const baseRoof=val("roof"), openings=val("openings"), loadpath=val("loadpath"), drainage=val("drainage"), elevation=val("elevation"), codeEra=val("codeEra");
+  const ep=exposurePenalty(exp), zp=zonePenalty(wz);
+  const storyPenalty = stories===2 ? 5 : 0;
+  const roofAdj=Math.max(0,baseRoof-ep-zp-storyPenalty);
+  const loadpathAdj=Math.max(0,loadpath-(stories===2?6:0)-zp*.35);
+  const fScore=floodScore(fema.zone,fema.sfha,elevation);
+  const hi=hurricaneIndex(geo.lat,geo.lon,geo.state,exp,wind);
+  const total=Math.round(roofAdj*.18 + openings*.14 + loadpathAdj*.22 + fScore*.20 + drainage*.10 + codeEra*.08 + elevation*.08);
+  const [classification,pill]=cls(total);
+
+  document.getElementById("score").textContent=total+"/100";
+  document.getElementById("scoreClass").innerHTML=`<span class="pill ${pill}">${classification}</span>`;
+  document.getElementById("floodZone").textContent=fema.zone||"--";
+  document.getElementById("sfha").textContent="SFHA: "+(fema.sfha||"--")+" "+(fema.subtype||"");
+  const bfe = fema.bfe || {display:"Not returned",datum:""};
+  document.getElementById("bfeValue").textContent = bfe.display || "Not returned";
+  document.getElementById("bfeDatum").textContent = bfe.datum ? ("Datum: " + bfe.datum) : "Manual FIRM review may be required";
+  document.getElementById("bfeRow").textContent = (bfe.display || "Not returned") + (bfe.datum ? " / " + bfe.datum : "");
+  document.getElementById("expMetric").textContent="Exposure "+exp;
+  document.getElementById("windMetric").textContent=wind+" mph • Zone "+wz;
+  document.getElementById("hIndex").textContent=hi+"/100";
+  document.getElementById("matched").textContent=geo.matched||"--";
+  document.getElementById("coords").textContent=geo.lat.toFixed(5)+", "+geo.lon.toFixed(5);
+  document.getElementById("county").textContent=(geo.county||"--")+", "+(geo.state||"--");
+  document.getElementById("femaSource").textContent=fema.source||"--";
+  document.getElementById("zoneStory").textContent="Zone "+wz+" / "+stories+" story";
+  document.getElementById("notes").textContent=fema.zone==="Not Found"?"FEMA polygon not found at point; manual review recommended.":"Preliminary screening only.";
+  document.getElementById("mapbox").innerHTML=mapIframe(geo.lat,geo.lon);
+
+  const scores={roofAdj, openings, loadpathAdj, flood:fScore};
+  drawBuilding(scores);
+  radar([roofAdj,openings,loadpathAdj,fScore,drainage,codeEra]);
+  recommendations({roofAdj,openings,loadpathAdj,drainage,elevation,codeEra}, fScore, fema);
+
+  snapshot={generatedAt:new Date().toISOString(),address:document.getElementById("address").value,geo,fema,stories,exposure:exp,windZone:wz,windSpeed:wind,scores:{roofAdj,openings,loadpathAdj,flood:fScore,drainage,codeEra,total},classification,hurricaneExposureIndex:hi};
+}
+async function geocodeArcGIS(address){
+  const url="https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&maxLocations=1&outFields=*&SingleLine="+encodeURIComponent(address);
+  const r=await fetch(url);
+  if(!r.ok)throw new Error("ArcGIS geocoder did not respond.");
+  const j=await r.json();
+  const c=j.candidates && j.candidates[0];
+  if(!c)throw new Error("No geocoding match found. Try a more complete address.");
+  return {lat:c.location.y, lon:c.location.x, matched:c.address, state:c.attributes.Region || "", county:c.attributes.Subregion || ""};
+}
+async function queryFema(lat,lon){
+  const endpoint="https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28/query";
+  const p=new URLSearchParams({
+    f:"json",
+    geometry:JSON.stringify({x:lon,y:lat,spatialReference:{wkid:4326}}),
+    geometryType:"esriGeometryPoint",
+    inSR:"4326",
+    spatialRel:"esriSpatialRelIntersects",
+    outFields:"*",
+    returnGeometry:"false"
+  });
+  const r=await fetch(endpoint+"?"+p.toString());
+  if(!r.ok)throw new Error("FEMA NFHL service did not respond.");
+  const j=await r.json();
+  const a=(j.features&&j.features[0]&&j.features[0].attributes)||null;
+  if(!a)return {zone:"Not Found",subtype:"No FEMA polygon returned at point",sfha:"--",source:"FEMA NFHL queried",bfe:{value:null,display:"Not returned",datum:""},raw:null};
+  return {zone:a.FLD_ZONE||"Unknown",subtype:a.ZONE_SUBTY||"",sfha:a.SFHA_TF||"--",source:"FEMA NFHL MapServer Layer 28",bfe:normalizeBFE(a),raw:a};
+}
+async function runAssessment(){
+  const address=document.getElementById("address").value.trim();
+  if(!address){setStatus("Enter an address first.");return;}
+  setStatus("Geocoding address...");
+  try{
+    const geo=await geocodeArcGIS(address);
+    lastGeo=geo;
+    setStatus("Address found:\n"+geo.matched+"\n\nQuerying FEMA NFHL flood zone...");
+    let fema;
+    try{fema=await queryFema(geo.lat,geo.lon);}
+    catch(e){fema={zone:"Unavailable",subtype:e.message,sfha:"--",source:"FEMA lookup unavailable",bfe:{value:null,display:"Unavailable",datum:""}};}
+    lastFema=fema;
+    setStatus("Screening complete.\n\nGeocoder: ArcGIS World Geocoding\nFlood data: "+fema.source+"\nExposure and wind zone are user-selected preliminary inputs.");
+    calculateAndRender(geo,fema);
+  }catch(e){
+    setStatus("Screening failed:\n"+e.message+"\n\nTry a full address with city, state, and ZIP code.");
+    document.getElementById("score").textContent="Error";
+    document.getElementById("scoreClass").textContent="See status panel";
+  }
+}
+function downloadSnapshot(){
+  const blob=new Blob([JSON.stringify(snapshot,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="RiskAtlas25_Assessment_Snapshot_v3.json"; a.click();
+}
+window.onload=()=>runAssessment();
+</script>
+</body>
+</html>
