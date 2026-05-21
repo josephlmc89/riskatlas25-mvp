@@ -237,19 +237,41 @@ function drawBuilding(scores){
 function radar(values){
   const labels=["Roof","Openings","Load Path","Flood","Drainage","Code Era"];
   const cx=165, cy=142, maxR=92;
-  let axes="", polyPts="", labelHtml="";
+  const labelOffsets=[
+    {x:0,y:-2},
+    {x:14,y:2},
+    {x:18,y:8},
+    {x:0,y:16},
+    {x:-18,y:8},
+    {x:-14,y:2}
+  ];
+  const scoreOffsets=[
+    {x:0,y:14},
+    {x:0,y:16},
+    {x:0,y:16},
+    {x:0,y:16},
+    {x:0,y:16},
+    {x:0,y:16}
+  ];
+  let axes="", polyPts="", labelHtml="", scoreHtml="";
   for(let i=0;i<6;i++){
     const ang=-Math.PI/2 + i*(2*Math.PI/6);
     const x=cx+Math.cos(ang)*maxR, y=cy+Math.sin(ang)*maxR;
     axes+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#26364f"/>`;
-    const lx=cx+Math.cos(ang)*(maxR+36), ly=cy+Math.sin(ang)*(maxR+24);
-    labelHtml+=`<text x="${lx}" y="${ly}" fill="#9fb2cc" font-size="11" text-anchor="middle">${labels[i]}</text>`;
+
+    const lx=cx+Math.cos(ang)*(maxR+34)+labelOffsets[i].x;
+    const ly=cy+Math.sin(ang)*(maxR+22)+labelOffsets[i].y;
+    const score=Math.max(0,Math.min(100,Math.round(values[i])));
+
+    labelHtml+=`<text x="${lx}" y="${ly}" fill="#b9c9de" font-size="11" text-anchor="middle">${labels[i]}</text>`;
+    scoreHtml+=`<text x="${lx+scoreOffsets[i].x}" y="${ly+scoreOffsets[i].y}" fill="#f5f9ff" font-size="12" font-weight="700" text-anchor="middle">${score}</text>`;
+
     const rr=maxR*(values[i]/100);
     polyPts+=`${cx+Math.cos(ang)*rr},${cy+Math.sin(ang)*rr} `;
   }
   let rings="";
   for(let r of [23,46,69,92]) rings+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#26364f"/>`;
-  document.getElementById("radar").innerHTML=`<svg width="360" height="285" viewBox="0 0 360 285">${rings}${axes}<polygon points="${polyPts}" fill="rgba(77,163,255,.32)" stroke="#4da3ff" stroke-width="2"/>${labelHtml}</svg>`;
+  document.getElementById("radar").innerHTML=`<svg width="360" height="285" viewBox="0 0 360 285">${rings}${axes}<polygon points="${polyPts}" fill="rgba(77,163,255,.32)" stroke="#4da3ff" stroke-width="2"/>${labelHtml}${scoreHtml}</svg>`;
 }
 
 function recommendations(inputs, fScore, fema){
