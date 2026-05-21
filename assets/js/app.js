@@ -158,6 +158,24 @@ function drawBuilding(scores){
       <pattern id="gridIso" width="24" height="24" patternUnits="userSpaceOnUse">
         <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
       </pattern>
+      <linearGradient id="floodGlow" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0" stop-color="rgba(138,220,255,.35)"/>
+        <stop offset=".65" stop-color="rgba(71,169,255,.22)"/>
+        <stop offset="1" stop-color="rgba(23,86,153,.08)"/>
+      </linearGradient>
+      <style>
+        .wind-arrow { opacity: .42; animation: drift 4.4s ease-in-out infinite; will-change: transform, opacity; }
+        .wind-arrow:nth-of-type(2){ animation-delay: .6s; }
+        .wind-arrow:nth-of-type(3){ animation-delay: 1.2s; }
+        .flood-wave { animation: wave 5s linear infinite; will-change: transform; }
+        .flood-pulse { animation: pulse 3.6s ease-in-out infinite; }
+        @keyframes drift { 0%,100% { transform: translateX(0); opacity: .3; } 50% { transform: translateX(12px); opacity: .52; } }
+        @keyframes wave { from { transform: translateX(0); } to { transform: translateX(18px); } }
+        @keyframes pulse { 0%,100% { opacity: .17; } 50% { opacity: .29; } }
+        @media (prefers-reduced-motion: reduce), (max-width: 760px) {
+          .wind-arrow, .flood-wave, .flood-pulse { animation: none !important; }
+        }
+      </style>
     </defs>
 
     <rect x="0" y="0" width="920" height="470" fill="url(#bgIso)"/>
@@ -169,8 +187,30 @@ function drawBuilding(scores){
     <text x="28" y="80" fill="#7ea0c8" font-size="11">Not to scale · illustrative zones only · verify with engineered drawings and code references</text>
 
     <g transform="translate(55,18)" filter="url(#dropIso)">
+      <!-- wind direction indicators -->
+      <g transform="translate(84,54)">
+        <g class="wind-arrow">
+          <line x1="0" y1="0" x2="75" y2="0" stroke="rgba(197,227,255,.8)" stroke-width="2.2" stroke-linecap="round"/>
+          <polygon points="75,0 64,-6 64,6" fill="rgba(197,227,255,.8)"/>
+        </g>
+        <g class="wind-arrow" transform="translate(0,26)">
+          <line x1="0" y1="0" x2="95" y2="0" stroke="rgba(197,227,255,.72)" stroke-width="2" stroke-linecap="round"/>
+          <polygon points="95,0 84,-6 84,6" fill="rgba(197,227,255,.72)"/>
+        </g>
+        <g class="wind-arrow" transform="translate(0,52)">
+          <line x1="0" y1="0" x2="82" y2="0" stroke="rgba(197,227,255,.68)" stroke-width="1.8" stroke-linecap="round"/>
+          <polygon points="82,0 72,-5 72,5" fill="rgba(197,227,255,.68)"/>
+        </g>
+      </g>
+
       <!-- ground platform -->
       <polygon points="105,335 430,390 640,300 315,245" fill="rgba(77,163,255,.13)" stroke="#35577c" stroke-width="2"/>
+      <polygon class="flood-pulse" points="128,312 415,360 592,286 305,238" fill="url(#floodGlow)" />
+      <g class="flood-wave">
+        <line x1="138" y1="305" x2="432" y2="354" stroke="rgba(190,233,255,.28)" stroke-width="2"/>
+        <line x1="168" y1="293" x2="458" y2="342" stroke="rgba(190,233,255,.2)" stroke-width="1.6"/>
+        <line x1="198" y1="282" x2="488" y2="330" stroke="rgba(190,233,255,.16)" stroke-width="1.3"/>
+      </g>
       <polygon points="128,312 415,360 592,286 305,238" fill="${floodC}" opacity=".88" stroke="#d8e2f2" stroke-width="2"/>
       <text x="390" y="350" fill="#07111f" font-size="13" font-weight="900">FLOOD / SITE INTERFACE</text>
 
