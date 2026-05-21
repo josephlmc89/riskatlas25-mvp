@@ -32,11 +32,20 @@ button.secondary{background:#17243a;border:1px solid #30435f}
 .helper-panel{margin-top:12px;padding:12px;border-radius:12px;border:1px solid #2b3e5c;background:#0a1424}
 .helper-panel h3{margin:0 0 8px;font-size:13px}
 .helper-text{margin:0 0 10px;font-size:12px;line-height:1.45;color:#c8d8ee}
-.legend-list,.scale-list{margin:0;padding-left:18px;display:grid;gap:6px}
-.legend-list li,.scale-list li{font-size:12px;line-height:1.45;color:#d5e2f4}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
-.dot.strong{background:#44d17d}
-.dot.weak{background:#ff7070}
+.scale-list{margin:0;padding-left:18px;display:grid;gap:6px}
+.scale-list li{font-size:12px;line-height:1.45;color:#d5e2f4}
+.score-legend{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.score-band{display:flex;align-items:center;gap:8px;font-size:12px;line-height:1.35;color:#d5e2f4;padding:8px 10px;border-radius:10px;border:1px solid #2b3e5c;background:#0c1a2f}
+.score-band strong{font-weight:700}
+.band-swatch{width:11px;height:11px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.score-band.high{border-color:rgba(68,209,125,.4)}
+.score-band.high .band-swatch{background:#44d17d}
+.score-band.moderate{border-color:rgba(255,200,87,.4)}
+.score-band.moderate .band-swatch{background:#ffc857}
+.score-band.elevated{border-color:rgba(255,144,82,.45)}
+.score-band.elevated .band-swatch{background:#ff9052}
+.score-band.critical{border-color:rgba(255,77,66,.45)}
+.score-band.critical .band-swatch{background:#ff4d42}
 .mpi-panel{border-color:#3a4f6f;background:#0b1527}
 .scale-list.compact{gap:5px}
 .mpi-caption{display:block;margin-bottom:8px;font-size:11px;line-height:1.35;color:#9fb6d3}
@@ -52,7 +61,8 @@ button.secondary{background:#17243a;border:1px solid #30435f}
   .svgbox{height:260px}.mapbox{height:270px}
   .recs{grid-template-columns:1fr}
   .helper-panel{padding:10px}
-  .legend-list,.scale-list{padding-left:16px}
+  .scale-list{padding-left:16px}
+  .score-legend{grid-template-columns:1fr}
   .row{display:block}
 }
 @media (max-width:480px){
