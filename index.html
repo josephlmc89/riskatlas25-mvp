@@ -71,6 +71,12 @@
     <option value="35">Poor / vulnerable</option>
     <option value="15">Critical deficiency</option>
   </select>
+  <label>Roof / Envelope Type</label>
+  <select id="roofType" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+    <option value="asphalt" selected>Asphalt Shingles</option>
+    <option value="metal">Metal Roof</option>
+    <option value="tile">Tile Roof</option>
+  </select>
   <label>Opening Protection</label>
   <select id="openings" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
     <option value="90">Impact-rated / shutters</option>
@@ -126,6 +132,7 @@
       <div class="row"><span class="muted">FEMA Source</span><span id="femaSource">--</span></div>
       <div class="row"><span class="muted">BFE / Datum</span><span id="bfeRow">--</span></div>
       <div class="row"><span class="muted">Wind Zone / Story</span><span id="zoneStory">--</span></div>
+      <div class="row"><span class="muted">Roof / Envelope Type</span><span id="roofTypeDisplay">--</span></div>
       <div class="row"><span class="muted">Notes</span><span id="notes">--</span></div>
     </div>
   </section>
