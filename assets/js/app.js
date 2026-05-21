@@ -1,5 +1,23 @@
-let lastGeo=null, lastFema=null, snapshot={}, stories=1;
+let lastGeo=null, lastFema=null, snapshot={}, stories=1, previousExposure=null, debrisTrigger=false;
 
+
+function clampScore(v){
+  return Math.max(0, Math.min(100, Math.round(v)));
+}
+
+function applyExposureEscalation(prevExp, nextExp){
+  const escalatedFromB = prevExp === "B" && (nextExp === "C" || nextExp === "D");
+  debrisTrigger = escalatedFromB;
+  if(!escalatedFromB) return;
+
+  const roofEl = document.getElementById("roof");
+  const openingsEl = document.getElementById("openings");
+  const roofPenalty = nextExp === "D" ? 12 : 8;
+  const openingsPenalty = nextExp === "D" ? 14 : 10;
+
+  roofEl.value = clampScore((+roofEl.value) - roofPenalty);
+  openingsEl.value = clampScore((+openingsEl.value) - openingsPenalty);
+}
 function setStories(n){
   stories=n;
   document.getElementById("btn1").classList.toggle("active",n===1);
@@ -320,8 +338,11 @@ function recommendations(inputs, fScore, fema){
   if(inputs.loadpathAdj < 70 || inputs.roofAdj < 70){
     recs.push(["1","Roof / Load Path Upgrade","Review hurricane clips, straps, roof-to-wall connections, roof deck attachment, and continuous load path from roof framing to foundation.","Priority: High","bad"]);
   }
-  if(inputs.openings < 70){
+  if(inputs.openings < 70 || debrisTrigger){
     recs.push(["2","Opening Protection","Consider impact-rated windows/doors or approved shutter systems for glazed openings, doors, garage doors, and other wind-borne-debris vulnerable openings.","Priority: High","bad"]);
+  }
+  if(debrisTrigger){
+    recs.push(["2A","Windborne Debris Action","Exposure changed from B to "+exp+". Escalate impact-resistant envelope measures, debris-region product approvals, and immediate opening protection planning.","Priority: Immediate","crit"]);
   }
   if(fScore < 60 || floodZone.includes("A") || floodZone.includes("V")){
     recs.push(["3","Flood Mitigation / Flood Vents","For enclosed areas below elevated floors, evaluate engineered or non-engineered flood openings/flood vents, equipment elevation, and dry/wet floodproofing options where allowed.","Priority: Critical Review","crit"]);
@@ -419,10 +440,21 @@ function downloadSnapshot(){
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="RiskAtlas25_Assessment_Snapshot_v3.json"; a.click();
 }
 window.onload=()=>{
+  previousExposure = sval("exposure");
   const recalcIds=["exposure","windZone","windSpeed","codeEra","roof","roofType","openings","loadpath","elevation","drainage"];
   recalcIds.forEach((id)=>{
     const el=document.getElementById(id);
-    if(el) el.addEventListener("change", recalculateIfReady);
+    if(!el) return;
+    if(id === "exposure"){
+      el.addEventListener("change", ()=>{
+        const nextExposure = sval("exposure");
+        applyExposureEscalation(previousExposure, nextExposure);
+        previousExposure = nextExposure;
+        recalculateIfReady();
+      });
+      return;
+    }
+    el.addEventListener("change", recalculateIfReady);
   });
   runAssessment();
 };
