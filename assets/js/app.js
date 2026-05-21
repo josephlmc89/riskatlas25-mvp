@@ -114,6 +114,11 @@ function mapIframe(lat,lon){
   return `<iframe src="https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}"></iframe>`;
 }
 
+
+function recalculateIfReady(){
+  if(lastGeo && lastFema) calculateAndRender(lastGeo,lastFema);
+}
+
 function drawBuilding(scores){
   const roofL=level(scores.roofAdj), envL=level(scores.openings), structL=level(scores.loadpathAdj), floodL=level(scores.flood);
   const roofC=colorByLevel(roofL), envC=colorByLevel(envL), structC=colorByLevel(structL), floodC=colorByLevel(floodL);
@@ -371,4 +376,11 @@ function downloadSnapshot(){
   const blob=new Blob([JSON.stringify(snapshot,null,2)],{type:"application/json"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="RiskAtlas25_Assessment_Snapshot_v3.json"; a.click();
 }
-window.onload=()=>runAssessment();
+window.onload=()=>{
+  const recalcIds=["exposure","windZone","windSpeed","codeEra","roof","roofType","openings","loadpath","elevation","drainage"];
+  recalcIds.forEach((id)=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener("change", recalculateIfReady);
+  });
+  runAssessment();
+};
