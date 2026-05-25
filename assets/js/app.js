@@ -60,6 +60,19 @@ function roofEnvelopeLabel(type){
   return "Asphalt Shingles";
 }
 
+function zoningLabel(code){
+  const map={
+    R1:"R-1 Low Density Residential",
+    R2:"R-2 Medium Density Residential",
+    R3:"R-3 Multifamily Residential",
+    MX:"Mixed-Use Corridor",
+    C:"Commercial / Retail",
+    I:"Industrial / Flex",
+    UNK:"Unknown / Verify with AHJ"
+  };
+  return map[code] || "Unknown / Verify with AHJ";
+}
+
 function normalizeBFE(attr){
   if(!attr) return {value:null, unit:"", datum:"", display:"Not returned"};
   const candidates = ["STATIC_BFE","BFE","BASE_FLOOD_ELEVATION","ELEV","FLD_ELEV","DEPTH"];
@@ -276,7 +289,7 @@ function radar(values){
 
 function recommendations(inputs, fScore, fema){
   const recs=[];
-  const exp=sval("exposure"), wz=sval("windZone");
+  const exp=sval("exposure"), wz=sval("windZone"), zoning=sval("zoning");
   const floodZone=String(fema.zone||"").toUpperCase();
   const mpiLabel = (value)=>{
     const mpi = parseInt(value,10);
@@ -303,6 +316,9 @@ function recommendations(inputs, fScore, fema){
   if(exp==="C" || exp==="D" || wz==="2" || wz==="3"){
     recs.push(["5","Exposure / Edge-Zone Detailing","Because Exposure "+exp+" and selected Zone "+wz+" increase wind demand, review edge/corner fastening schedules, roof perimeter detailing, and opening protection strategy.","Priority: Technical Review","warn"]);
   }
+  if(zoning==="MX" || zoning==="C" || zoning==="I"){
+    recs.push(["6A","Zoning-Based Use Review","Selected zoning context suggests mixed/commercial/industrial occupancy. Confirm occupancy classification, envelope performance expectations, and any use-specific flood/wind triggers with the local AHJ.","Priority: Coordination","purple"]);
+  }
   if(inputs.codeEra < 70){
     recs.push(["6","Code Era Verification","Verify original permit era, retrofit history, product approvals, and whether the building predates current wind and flood-resilience requirements.","Priority: Documentation","blue"]);
   }
@@ -325,7 +341,7 @@ function recommendations(inputs, fScore, fema){
     </div>`).join("");
 }
 function calculateAndRender(geo,fema){
-  const exp=sval("exposure"), wind=val("windSpeed"), wz=sval("windZone"), roofType=sval("roofType");
+  const exp=sval("exposure"), wind=val("windSpeed"), wz=sval("windZone"), roofType=sval("roofType"), zoning=sval("zoning");
   const baseRoof=val("roof"), openings=val("openings"), loadpath=val("loadpath"), drainage=val("drainage"), elevation=val("elevation"), codeEra=val("codeEra");
   const ep=exposurePenalty(exp), zp=zonePenalty(wz);
   const storyPenalty = stories===2 ? 5 : 0;
@@ -354,6 +370,7 @@ function calculateAndRender(geo,fema){
   document.getElementById("femaSource").textContent=fema.source||"--";
   document.getElementById("zoneStory").textContent="Zone "+wz+" / "+stories+" story";
   document.getElementById("roofTypeDisplay").textContent=roofEnvelopeLabel(roofType);
+  document.getElementById("zoningRow").textContent=zoningLabel(zoning);
   document.getElementById("notes").textContent=fema.zone==="Not Found"?"FEMA polygon not found at point; manual review recommended. All roof/envelope type effects are preliminary screening assumptions only, not a final engineering determination.":"Preliminary screening only. Roof/envelope type effects are assumptions pending field verification and not a final engineering determination.";
   document.getElementById("mapbox").innerHTML=mapIframe(geo.lat,geo.lon);
 
@@ -362,7 +379,7 @@ function calculateAndRender(geo,fema){
   radar([roofAdj,openings,loadpathAdj,fScore,drainage,codeEra]);
   recommendations({roofAdj,openings,loadpathAdj,drainage,elevation,codeEra,roofType}, fScore, fema);
 
-  snapshot={generatedAt:new Date().toISOString(),address:document.getElementById("address").value,geo,fema,stories,exposure:exp,windZone:wz,windSpeed:wind,roofType:roofEnvelopeLabel(roofType),scores:{roofAdj,openings,loadpathAdj,flood:fScore,drainage,codeEra,total,roofTypeModifier},classification,hurricaneExposureIndex:hi};
+  snapshot={generatedAt:new Date().toISOString(),address:document.getElementById("address").value,geo,fema,stories,exposure:exp,windZone:wz,windSpeed:wind,zoning:{code:zoning,label:zoningLabel(zoning)},roofType:roofEnvelopeLabel(roofType),scores:{roofAdj,openings,loadpathAdj,flood:fScore,drainage,codeEra,total,roofTypeModifier},classification,hurricaneExposureIndex:hi};
 }
 
 
