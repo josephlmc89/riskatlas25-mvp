@@ -54,16 +54,7 @@
     <option value="180">180 mph</option>
   </select>
 
-  <label>Local Zoning Context</label>
-  <select id="zoning" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
-    <option value="R1" selected>R-1 Low Density Residential</option>
-    <option value="R2">R-2 Medium Density Residential</option>
-    <option value="R3">R-3 Multifamily Residential</option>
-    <option value="MX">Mixed-Use Corridor</option>
-    <option value="C">Commercial / Retail</option>
-    <option value="I">Industrial / Flex</option>
-    <option value="UNK">Unknown / Verify with AHJ</option>
-  </select>
+  <!-- Zoning selector moved to Property Data section for user-driven selection context -->
 
   <label>Year Built / Code Era</label>
   <select id="codeEra" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
@@ -148,6 +139,18 @@
       <div class="row"><span class="muted">BFE / Datum</span><span id="bfeRow">--</span></div>
       <div class="row"><span class="muted">Wind Zone / Story</span><span id="zoneStory">--</span></div>
       <div class="row"><span class="muted">Zoning Context</span><span id="zoningRow">--</span></div>
+      <div class="property-control">
+        <label for="zoning">User-Selected Zoning</label>
+        <select id="zoning" onchange="if(lastGeo) calculateAndRender(lastGeo,lastFema)">
+          <option value="R1" selected>R-1 Low Density Residential</option>
+          <option value="R2">R-2 Medium Density Residential</option>
+          <option value="R3">R-3 Multifamily Residential</option>
+          <option value="MX">Mixed-Use Corridor</option>
+          <option value="C">Commercial / Retail</option>
+          <option value="I">Industrial / Flex</option>
+          <option value="UNK">Unknown / Verify with AHJ</option>
+        </select>
+      </div>
       <div class="row"><span class="muted">Roof / Envelope Type</span><span id="roofTypeDisplay">--</span></div>
       <div class="row"><span class="muted">Notes</span><span id="notes">--</span></div>
     </div>
